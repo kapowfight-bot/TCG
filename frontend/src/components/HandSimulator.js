@@ -531,6 +531,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
       const avgPokemon = (testStats.totalPokemon / testStats.totalHandsDrawn).toFixed(1);
       const avgTrainer = (testStats.totalTrainer / testStats.totalHandsDrawn).toFixed(1);
       const avgEnergy = (testStats.totalEnergy / testStats.totalHandsDrawn).toFixed(1);
+      const avgBasicPokemon = (testStats.totalBasicPokemon / testStats.totalHandsDrawn).toFixed(1);
       
       console.log('Saving test results:', {
         deckId,
@@ -539,7 +540,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         mulliganPercentage,
         avgPokemon,
         avgTrainer,
-        avgEnergy
+        avgEnergy,
+        avgBasicPokemon
       });
       
       // Save to backend
@@ -551,7 +553,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
           mulligan_percentage: parseFloat(mulliganPercentage),
           avg_pokemon: parseFloat(avgPokemon),
           avg_trainer: parseFloat(avgTrainer),
-          avg_energy: parseFloat(avgEnergy)
+          avg_energy: parseFloat(avgEnergy),
+          avg_basic_pokemon: parseFloat(avgBasicPokemon)
         },
         { withCredentials: true }
       );
