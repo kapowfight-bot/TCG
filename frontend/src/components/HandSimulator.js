@@ -12,20 +12,48 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
     const cards = [];
     const lines = deckListText.split('\n').filter(line => line.trim());
     
+    // Trainer/Supporter/Item/Stadium keywords
+    const trainerKeywords = [
+      'Professor', 'Boss', 'Ball', 'Candy', 'Switch', 'Potion', 'Stadium',
+      'Research', 'Letter', 'Nest', 'Ultra', 'Great', 'Master', 'Level',
+      'Super Rod', 'VS Seeker', 'Town', 'Path', 'Escape Rope', 'Iono',
+      'Arven', 'Miriam', 'Pepper', 'Counter Catcher', 'Prime Catcher',
+      'Technical Machine', 'Beach', 'Temple', 'Court', 'Festival',
+      'Defiance Band', 'Hero\'s Cape', 'Bravery Charm', 'Muscle Band',
+      'Choice Belt', 'Rare Candy', 'Pal Pad', 'Ancient Booster', 'Future Booster'
+    ];
+    
     for (const line of lines) {
-      // PTCGL format: "4 Pikachu ex MEW 123"
-      const match = line.match(/^(\d+)\s+(.+?)(?:\s+[A-Z]+\s+\d+)?$/);
+      // PTCGL format: "4 Pikachu ex MEW 123" or "4 Pikachu MEW 123"
+      const match = line.match(/^(\d+)\s+(.+?)(?:\s+[A-Z]{2,}\s+\d+)?$/);
       if (match) {
         const count = parseInt(match[1]);
         const cardName = match[2].trim();
+        
+        // Check if it's an Energy card
+        const isEnergy = cardName.includes('Energy');
+        
+        // Check if it's a Trainer/Supporter/Item/Stadium card
+        const isTrainer = trainerKeywords.some(keyword => 
+          cardName.includes(keyword)
+        );
+        
+        // Check if it's an evolved/special Pokemon (ex, V, VMAX, etc.)
+        const isEvolved = /\s+(ex|V|VMAX|VSTAR|GX|EX|Tag Team|&|BREAK|Prime)$/i.test(cardName);
+        
+        // A Basic Pokemon is:
+        // - Not an Energy card
+        // - Not a Trainer card
+        // - Not an evolved/special Pokemon
+        const isBasic = !isEnergy && !isTrainer && !isEvolved;
         
         for (let i = 0; i < count; i++) {
           cards.push({
             name: cardName,
             id: `${cardName}-${i}`,
-            // Check if it's a Basic Pokemon (not ex, V, VMAX, VSTAR, GX, etc.)
-            isBasic: !cardName.match(/\s+(ex|V|VMAX|VSTAR|GX|EX|Tag Team|&)/i) && 
-                     !cardName.match(/^(Professor|Boss|Rare Candy|Energy|Ultra Ball|Nest Ball|Great Ball|Poké Ball)/i)
+            isBasic: isBasic,
+            isEnergy: isEnergy,
+            isTrainer: isTrainer
           });
         }
       }
