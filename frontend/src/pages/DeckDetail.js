@@ -608,41 +608,57 @@ const DeckDetail = ({ user, onLogout }) => {
         {/* Test Results */}
         {deck.test_results && (
           <div className="glass rounded-2xl p-6 mb-8">
-            <h3 className="text-xl font-bold mb-4">Hand Simulator Test Results</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <div className="bg-[#0f0f10] rounded-xl p-4">
-                <div className="text-sm text-gray-400 mb-1">Hands Tested</div>
-                <div className="text-2xl font-bold">{deck.test_results.total_hands}</div>
-              </div>
-              <div className="bg-[#0f0f10] rounded-xl p-4">
-                <div className="text-sm text-gray-400 mb-1">Mulligan Rate</div>
-                <div className="text-2xl font-bold text-orange-400">{deck.test_results.mulligan_percentage}%</div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {deck.test_results.mulligan_count} mulligans
-                </div>
-              </div>
-              <div className="bg-[#0f0f10] rounded-xl p-4">
-                <div className="text-sm text-gray-400 mb-1">Avg Pokemon</div>
-                <div className="text-2xl font-bold text-green-400">{deck.test_results.avg_pokemon}</div>
-                <div className="text-xs text-gray-500 mt-1">per hand</div>
-              </div>
-              <div className="bg-[#0f0f10] rounded-xl p-4">
-                <div className="text-sm text-gray-400 mb-1">Avg Trainer</div>
-                <div className="text-2xl font-bold text-blue-400">{deck.test_results.avg_trainer}</div>
-                <div className="text-xs text-gray-500 mt-1">per hand</div>
-              </div>
-              <div className="bg-[#0f0f10] rounded-xl p-4">
-                <div className="text-sm text-gray-400 mb-1">Avg Energy</div>
-                <div className="text-2xl font-bold text-yellow-400">{deck.test_results.avg_energy}</div>
-                <div className="text-xs text-gray-500 mt-1">per hand</div>
-              </div>
-              <div className="bg-[#0f0f10] rounded-xl p-4">
-                <div className="text-sm text-gray-400 mb-1">Last Tested</div>
-                <div className="text-sm font-bold">
-                  {new Date(deck.test_results.last_tested).toLocaleDateString()}
-                </div>
-              </div>
+            <div 
+              className="flex items-center justify-between cursor-pointer mb-4"
+              onClick={() => setIsTestResultsExpanded(!isTestResultsExpanded)}
+            >
+              <h3 className="text-xl font-bold">Hand Simulator Test Results</h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-6 w-6 transition-transform duration-200 ${isTestResultsExpanded ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
+            {isTestResultsExpanded && (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Hands Tested</div>
+                  <div className="text-2xl font-bold">{deck.test_results.total_hands}</div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Mulligan Rate</div>
+                  <div className="text-2xl font-bold text-orange-400">{deck.test_results.mulligan_percentage}%</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {deck.test_results.mulligan_count} mulligans
+                  </div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Avg Pokemon</div>
+                  <div className="text-2xl font-bold text-green-400">{deck.test_results.avg_pokemon}</div>
+                  <div className="text-xs text-gray-500 mt-1">per hand</div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Avg Trainer</div>
+                  <div className="text-2xl font-bold text-blue-400">{deck.test_results.avg_trainer}</div>
+                  <div className="text-xs text-gray-500 mt-1">per hand</div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Avg Energy</div>
+                  <div className="text-2xl font-bold text-yellow-400">{deck.test_results.avg_energy}</div>
+                  <div className="text-xs text-gray-500 mt-1">per hand</div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Last Tested</div>
+                  <div className="text-sm font-bold">
+                    {new Date(deck.test_results.last_tested).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
