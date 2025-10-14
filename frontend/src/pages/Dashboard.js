@@ -163,8 +163,35 @@ const Dashboard = ({ user, onLogout }) => {
             }
           };
         } catch (apiError) {
-          console.error(`✗ Failed: ${cacheKey} - ${apiError.message}`);
-          return null;
+          console.error(`✗ API Failed: ${cacheKey} - ${apiError.message}`);
+          console.log(`  → Creating basic card entry from deck list info`);
+          
+          // Create basic card entry from deck list information
+          const supertype = section === 'pokemon' ? 'Pokémon' : (section === 'trainer' ? 'Trainer' : 'Energy');
+          
+          return {
+            cacheKey,
+            fromDeckListOnly: true,  // Mark for database saving with basic info
+            data: {
+              name: cardName,
+              image: null,  // No image available
+              supertype: supertype,
+              subtypes: [],
+              hp: null,
+              types: [],
+              abilities: [],
+              attacks: [],
+              weaknesses: [],
+              resistances: [],
+              retreatCost: [],
+              rules: [],
+              isBasic: false,  // Can't determine without API
+              isPokemon: section === 'pokemon',
+              isTrainer: section === 'trainer',
+              isEnergy: section === 'energy',
+              section: section
+            }
+          };
         }
       }
     });
