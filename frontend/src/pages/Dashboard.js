@@ -135,9 +135,23 @@ const Dashboard = ({ user, onLogout }) => {
 
     setIsSubmitting(true);
     try {
+      // Count unique cards
+      const lines = deckList.split('\n').filter(line => line.trim());
+      const uniqueCards = new Set();
+      lines.forEach(line => {
+        const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+        if (match) {
+          uniqueCards.add(`${match[3]}-${match[4]}`);
+        }
+      });
+      
       // Fetch card data before saving
-      toast.info('Fetching card data from Pokemon TCG API...');
+      toast.info(`Fetching ${uniqueCards.size} unique cards in parallel...`);
+      const startTime = Date.now();
       const cardData = await fetchCardDataForDeck(deckList);
+      const fetchTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      toast.success(`Fetched ${Object.keys(cardData).length} cards in ${fetchTime}s`);
       
       await axios.post(
         `${API}/decks`,
