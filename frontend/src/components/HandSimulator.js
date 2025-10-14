@@ -7,6 +7,8 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
   const [hand, setHand] = useState([]);
   const [mulliganCount, setMulliganCount] = useState(0);
   const [hasBasic, setHasBasic] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [cardCache, setCardCache] = useState({});
 
   // Parse deck list into card objects
   const parseDeckList = (deckListText) => {
