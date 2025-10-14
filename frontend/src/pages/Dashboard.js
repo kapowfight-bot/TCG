@@ -41,7 +41,7 @@ const Dashboard = ({ user, onLogout }) => {
     const cardDataMap = {};
     const lines = deckListText.split('\n').filter(line => line.trim());
     
-    console.log('=== Starting parallel card data fetch ===');
+    console.log('=== Starting card fetch from local database ===');
     console.log('Total lines:', lines.length);
     
     // Parse all unique cards first
@@ -63,34 +63,23 @@ const Dashboard = ({ user, onLogout }) => {
     
     console.log(`Found ${uniqueCards.size} unique cards to fetch`);
     
-    // Fetch all cards in parallel
+    // Fetch all cards in parallel from our database
     const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { cardName, setCode, cardNumber }]) => {
       try {
-        // Try lowercase first
-        let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+        // Try our local database first
+        const response = await axios.get(
+          `${API}/cards/${setCode}/${cardNumber}`,
+          { withCredentials: true, timeout: 5000 }
+        );
         
-        let response;
-        try {
-          response = await axios.get(apiUrl, { timeout: 5000 });
-        } catch (firstError) {
-          // If lowercase fails, try uppercase
-          if (firstError.response?.status === 404) {
-            apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
-            response = await axios.get(apiUrl, { timeout: 5000 });
-          } else {
-            throw firstError;
-          }
-        }
-        
-        const card = response.data.data;
-        
-        console.log(`✓ ${card.name} (${cacheKey})`);
+        const card = response.data;
+        console.log(`✓ ${card.name} (${cacheKey}) from local DB`);
         
         return {
           cacheKey,
           data: {
             name: card.name,
-            image: card.images?.small || null,
+            image: card.image_small || null,
             supertype: card.supertype,
             subtypes: card.subtypes || [],
             hp: card.hp || null,
@@ -99,7 +88,7 @@ const Dashboard = ({ user, onLogout }) => {
             attacks: card.attacks || [],
             weaknesses: card.weaknesses || [],
             resistances: card.resistances || [],
-            retreatCost: card.retreatCost || [],
+            retreatCost: card.retreat_cost || [],
             rules: card.rules || [],
             isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
             isPokemon: card.supertype === 'Pokémon',
@@ -108,8 +97,52 @@ const Dashboard = ({ user, onLogout }) => {
           }
         };
       } catch (error) {
-        console.error(`✗ Failed: ${cacheKey} - ${error.message}`);
-        return null;
+        // Fallback to external API if not in our database
+        console.log(`  → Not in local DB, trying external API for ${cacheKey}`);
+        
+        try {
+          let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+          let apiResponse;
+          
+          try {
+            apiResponse = await axios.get(apiUrl, { timeout: 5000 });
+          } catch (firstError) {
+            if (firstError.response?.status === 404) {
+              apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
+              apiResponse = await axios.get(apiUrl, { timeout: 5000 });
+            } else {
+              throw firstError;
+            }
+          }
+          
+          const card = apiResponse.data.data;
+          console.log(`✓ ${card.name} (${cacheKey}) from external API`);
+          
+          return {
+            cacheKey,
+            data: {
+              name: card.name,
+              image: card.images?.small || null,
+              supertype: card.supertype,
+              subtypes: card.subtypes || [],
+              hp: card.hp || null,
+              types: card.types || [],
+              abilities: card.abilities || [],
+              attacks: card.attacks || [],
+              weaknesses: card.weaknesses || [],
+              resistances: card.resistances || [],
+              retreatCost: card.retreatCost || [],
+              rules: card.rules || [],
+              isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+              isPokemon: card.supertype === 'Pokémon',
+              isTrainer: card.supertype === 'Trainer',
+              isEnergy: card.supertype === 'Energy'
+            }
+          };
+        } catch (apiError) {
+          console.error(`✗ Failed: ${cacheKey} - ${apiError.message}`);
+          return null;
+        }
       }
     });
     
