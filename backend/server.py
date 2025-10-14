@@ -314,7 +314,7 @@ async def get_deck(deck_id: str, request: Request):
 
 @api_router.put("/decks/{deck_id}", response_model=Deck)
 async def update_deck(deck_id: str, deck_update: DeckUpdate, request: Request):
-    """Update a deck"""
+    """Update a deck - resets test_results if deck_list changes"""
     user = await get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -327,6 +327,11 @@ async def update_deck(deck_id: str, deck_update: DeckUpdate, request: Request):
     # Prepare update data
     update_data = {k: v for k, v in deck_update.model_dump().items() if v is not None}
     update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    # If deck_list is being updated, reset test_results
+    # (user needs to re-run hand simulator with new deck)
+    if deck_update.deck_list is not None:
+        update_data['test_results'] = None
     
     await db.decks.update_one({"id": deck_id}, {"$set": update_data})
     
