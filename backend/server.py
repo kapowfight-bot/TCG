@@ -470,6 +470,10 @@ async def get_deck_stats(deck_id: str, request: Request):
     went_second_wins = sum(1 for m in matches if m["result"] == "win" and not m["went_first"])
     went_second_losses = sum(1 for m in matches if m["result"] == "loss" and not m["went_first"])
     
+    # Calculate mulligan stats
+    total_mulligans = sum(m.get("mulligan_count", 0) for m in matches)
+    avg_mulligans = (total_mulligans / total_matches) if total_matches > 0 else 0
+    
     # Calculate opponent stats
     opponent_stats = {}
     for match in matches:
@@ -493,6 +497,8 @@ async def get_deck_stats(deck_id: str, request: Request):
         went_first_losses=went_first_losses,
         went_second_wins=went_second_wins,
         went_second_losses=went_second_losses,
+        avg_mulligans=round(avg_mulligans, 2),
+        total_mulligans=total_mulligans,
         opponent_stats=opponent_stats
     )
 
