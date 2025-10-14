@@ -241,47 +241,80 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {hand.map((card, index) => (
-                  <div
-                    key={card.id}
-                    data-testid={`hand-card-${index}`}
-                    className={`bg-[#0f0f10] rounded-xl p-4 border-2 ${
-                      card.isBasic 
-                        ? 'border-emerald-500/50 bg-emerald-500/5' 
-                        : card.isEnergy
-                        ? 'border-yellow-500/50 bg-yellow-500/5'
-                        : card.isTrainer
-                        ? 'border-blue-500/50 bg-blue-500/5'
-                        : 'border-purple-500/50 bg-purple-500/5'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="text-xs text-gray-500">#{index + 1}</span>
-                      {card.isBasic && (
-                        <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">
-                          Basic
-                        </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                {hand.map((card, index) => {
+                  const cardData = card.data;
+                  const isBasic = cardData?.isBasic;
+                  const isPokemon = cardData?.isPokemon;
+                  const isTrainer = cardData?.isTrainer;
+                  const isEnergy = cardData?.isEnergy;
+                  const isEvolved = isPokemon && !isBasic;
+                  
+                  return (
+                    <div
+                      key={card.id}
+                      data-testid={`hand-card-${index}`}
+                      className={`rounded-xl overflow-hidden border-4 transition-all hover:scale-105 ${
+                        isBasic 
+                          ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' 
+                          : isEvolved
+                          ? 'border-purple-500 shadow-lg shadow-purple-500/20'
+                          : isTrainer
+                          ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+                          : isEnergy
+                          ? 'border-yellow-500 shadow-lg shadow-yellow-500/20'
+                          : 'border-gray-700'
+                      }`}
+                    >
+                      {/* Card Image */}
+                      {cardData?.image ? (
+                        <img 
+                          src={cardData.image} 
+                          alt={cardData.name}
+                          className="w-full h-auto"
+                        />
+                      ) : (
+                        <div className="aspect-[2.5/3.5] bg-[#0f0f10] flex items-center justify-center p-4">
+                          <div className="text-center">
+                            <p className="text-sm font-medium break-words">{card.name}</p>
+                            <p className="text-xs text-gray-500 mt-2">{card.setCode} {card.cardNumber}</p>
+                          </div>
+                        </div>
                       )}
-                      {card.isEnergy && (
-                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">
-                          Energy
+                      
+                      {/* Card Type Badge */}
+                      <div className="absolute top-2 right-2">
+                        {isBasic && (
+                          <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full font-bold shadow-lg">
+                            BASIC
+                          </span>
+                        )}
+                        {isEvolved && cardData?.subtypes && (
+                          <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded-full font-bold shadow-lg">
+                            {cardData.subtypes.join(' ')}
+                          </span>
+                        )}
+                        {isTrainer && (
+                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full font-bold shadow-lg">
+                            TRAINER
+                          </span>
+                        )}
+                        {isEnergy && (
+                          <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded-full font-bold shadow-lg">
+                            ENERGY
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Card Number */}
+                      <div className="absolute top-2 left-2">
+                        <span className="text-xs bg-black/80 text-white px-2 py-1 rounded-full font-bold">
+                          #{index + 1}
                         </span>
-                      )}
-                      {card.isTrainer && (
-                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
-                          Trainer
-                        </span>
-                      )}
-                      {!card.isBasic && !card.isEnergy && !card.isTrainer && (
-                        <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">
-                          Evolved
-                        </span>
-                      )}
+                      </div>
                     </div>
-                    <p className="text-sm font-medium break-words">{card.name}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Statistics */}
