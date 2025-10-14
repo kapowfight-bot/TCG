@@ -396,7 +396,7 @@ const DeckDetail = ({ user, onLogout }) => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className="glass rounded-2xl p-6">
             <div className="text-sm text-gray-400 mb-1">Total Matches</div>
             <div className="text-3xl font-bold">{stats.total_matches}</div>
@@ -417,6 +417,13 @@ const DeckDetail = ({ user, onLogout }) => {
               {stats.went_first_wins + stats.went_first_losses > 0
                 ? Math.round((stats.went_first_wins / (stats.went_first_wins + stats.went_first_losses)) * 100)
                 : 0}% WR
+            </div>
+          </div>
+          <div className="glass rounded-2xl p-6">
+            <div className="text-sm text-gray-400 mb-1">Avg Mulligans</div>
+            <div className="text-3xl font-bold text-orange-400">{stats.avg_mulligans}</div>
+            <div className="text-sm text-gray-500 mt-1">
+              {stats.total_mulligans} total
             </div>
           </div>
           <div className="glass rounded-2xl p-6">
