@@ -179,14 +179,15 @@ const DeckDetail = ({ user, onLogout }) => {
         console.log(`Card ${cacheKey} not in local DB, trying external API...`);
         
         try {
-          let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+          const POKEMON_API = process.env.REACT_APP_POKEMON_API_URL || 'https://api.pokemontcg.io/v2';
+          let apiUrl = `${POKEMON_API}/cards/${setCode.toLowerCase()}-${cardNumber}`;
           let apiResponse;
           
           try {
             apiResponse = await axios.get(apiUrl, { timeout: 5000 });
           } catch (firstError) {
             if (firstError.response?.status === 404) {
-              apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
+              apiUrl = `${POKEMON_API}/cards/${setCode}-${cardNumber}`;
               apiResponse = await axios.get(apiUrl, { timeout: 5000 });
             } else {
               throw firstError;
