@@ -65,12 +65,33 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   // Parse deck list into card objects with set codes
   const parseDeckList = (deckListText) => {
     const cards = [];
-    const lines = deckListText.split('\n').filter(line => line.trim());
+    const lines = deckListText.split('\n');
+    
+    let currentSection = 'unknown'; // pokemon, trainer, or energy
     
     for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+      
+      // Check for section headers
+      if (trimmedLine.match(/^Pokémon:/i) || trimmedLine.match(/^Pokemon:/i)) {
+        currentSection = 'pokemon';
+        console.log('Found Pokemon section');
+        continue;
+      }
+      if (trimmedLine.match(/^Trainer:/i)) {
+        currentSection = 'trainer';
+        console.log('Found Trainer section');
+        continue;
+      }
+      if (trimmedLine.match(/^Energy:/i)) {
+        currentSection = 'energy';
+        console.log('Found Energy section');
+        continue;
+      }
+      
       // PTCGL format: "4 Pikachu ex SVI 78" or "4 Professor's Research SVI 189"
-      // Match: count, card name, set code (2-4 letters), card number
-      const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+      const match = trimmedLine.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
       if (match) {
         const count = parseInt(match[1]);
         const cardName = match[2].trim();
@@ -83,11 +104,18 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
             setCode: setCode,
             cardNumber: cardNumber,
             id: `${setCode}-${cardNumber}-${i}`,
+            section: currentSection, // Store which section this card is from
             data: null // Will be populated when drawing
           });
         }
       }
     }
+    
+    console.log(`Parsed ${cards.length} cards:`, {
+      pokemon: cards.filter(c => c.section === 'pokemon').length,
+      trainer: cards.filter(c => c.section === 'trainer').length,
+      energy: cards.filter(c => c.section === 'energy').length
+    });
     
     return cards;
   };
