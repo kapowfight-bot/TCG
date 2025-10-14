@@ -324,11 +324,23 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
                         </span>
                       </div>
                       
+                      {/* Debug Info - Show if data exists */}
+                      {cardData?.error && (
+                        <div className="mb-2">
+                          <p className="text-xs text-red-400">Data not cached</p>
+                        </div>
+                      )}
+                      
                       {/* Card Set Info */}
                       <div className="mt-auto">
                         <p className="text-xs text-gray-500">
                           {card.setCode} {card.cardNumber}
                         </p>
+                        {cardData?.supertype && (
+                          <p className="text-xs text-gray-600">
+                            {cardData.supertype}
+                          </p>
+                        )}
                       </div>
                     </div>
                   );
