@@ -451,11 +451,14 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
       
       console.log('Hand drawn successfully');
       
+      // Count basic Pokemon from previously selected cards (before reset)
+      // Only count if there was a previous hand (not the first draw)
+      const basicPokemonCount = hand.length > 0 ? selectedBasics.size : 0;
+      
       // Update test statistics
       const pokemonCount = handWithData.filter(c => c.data?.isPokemon).length;
       const trainerCount = handWithData.filter(c => c.data?.isTrainer).length;
       const energyCount = handWithData.filter(c => c.data?.isEnergy).length;
-      const basicPokemonCount = handWithData.filter(c => c.data?.isPokemon && c.data?.isBasic).length;
       
       setTestStats(prev => ({
         totalHandsDrawn: prev.totalHandsDrawn + 1,
@@ -471,7 +474,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         pokemon: pokemonCount,
         trainer: trainerCount,
         energy: energyCount,
-        basicPokemon: basicPokemonCount
+        basicPokemonFromSelection: basicPokemonCount,
+        selectedBasicsSize: selectedBasics.size
       });
       
       setHand(handWithData);
