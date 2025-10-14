@@ -166,6 +166,21 @@ const Dashboard = ({ user, onLogout }) => {
           console.error(`✗ API Failed: ${cacheKey} - ${apiError.message}`);
           console.log(`  → Creating basic card entry from deck list info`);
           
+          // Try to fetch image from LimitlessTCG
+          let imageUrl = null;
+          try {
+            const imageResponse = await axios.get(
+              `${API}/cards/image/${setCode}/${cardNumber}`,
+              { withCredentials: true, timeout: 5000 }
+            );
+            imageUrl = imageResponse.data.image_url;
+            if (imageUrl) {
+              console.log(`  ✓ Got image from LimitlessTCG`);
+            }
+          } catch (imageError) {
+            console.log(`  → No image available from LimitlessTCG`);
+          }
+          
           // Create basic card entry from deck list information
           const supertype = section === 'pokemon' ? 'Pokémon' : (section === 'trainer' ? 'Trainer' : 'Energy');
           
@@ -174,7 +189,7 @@ const Dashboard = ({ user, onLogout }) => {
             fromDeckListOnly: true,  // Mark for database saving with basic info
             data: {
               name: cardName,
-              image: null,  // No image available
+              image: imageUrl,  // Image from LimitlessTCG or null
               supertype: supertype,
               subtypes: [],
               hp: null,
