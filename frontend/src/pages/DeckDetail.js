@@ -80,6 +80,7 @@ const DeckDetail = ({ user, onLogout }) => {
           opponent_deck_name: opponentDeck,
           went_first: wentFirst,
           bad_game: badGame,
+          mulligan_count: mulliganCount,
           notes: matchNotes || null,
         },
         { withCredentials: true }
