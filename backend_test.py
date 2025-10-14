@@ -327,10 +327,15 @@ class PokemonTCGTrackerTester:
         # Test new features (test statistics)
         self.test_save_test_results_without_auth()
         self.test_test_results_endpoint_structure()
+        self.test_test_results_data_validation()
+        self.test_stats_endpoint_structure()
         
         # Test additional endpoints
         self.test_cards_endpoint()
         self.test_card_lookup_endpoint()
+        
+        # Test comprehensive endpoint coverage
+        self.test_comprehensive_endpoint_coverage()
         
         # Print summary
         print("\n" + "=" * 50)
