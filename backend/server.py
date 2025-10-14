@@ -650,7 +650,7 @@ class TestResults(BaseModel):
 
 @api_router.post("/decks/{deck_id}/test-results")
 async def save_test_results(deck_id: str, test_results: TestResults, request: Request):
-    """Save hand simulator test results to deck"""
+    """Save hand simulator test results to deck (accumulative)"""
     user = await get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -660,23 +660,50 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
     if not deck:
         raise HTTPException(status_code=404, detail="Deck not found")
     
-    # Update deck with test results
+    # Get existing test results (if any)
+    existing_results = deck.get("test_results", {})
+    
+    # Calculate accumulated totals
+    old_total_hands = existing_results.get("total_hands", 0)
+    old_mulligan_count = existing_results.get("mulligan_count", 0)
+    old_total_pokemon = existing_results.get("avg_pokemon", 0) * old_total_hands
+    old_total_trainer = existing_results.get("avg_trainer", 0) * old_total_hands
+    old_total_energy = existing_results.get("avg_energy", 0) * old_total_hands
+    
+    # Add new test results to existing
+    new_total_hands = old_total_hands + test_results.total_hands
+    new_mulligan_count = old_mulligan_count + test_results.mulligan_count
+    new_total_pokemon = old_total_pokemon + (test_results.avg_pokemon * test_results.total_hands)
+    new_total_trainer = old_total_trainer + (test_results.avg_trainer * test_results.total_hands)
+    new_total_energy = old_total_energy + (test_results.avg_energy * test_results.total_hands)
+    
+    # Calculate new averages
+    new_mulligan_percentage = (new_mulligan_count / new_total_hands * 100) if new_total_hands > 0 else 0
+    new_avg_pokemon = new_total_pokemon / new_total_hands if new_total_hands > 0 else 0
+    new_avg_trainer = new_total_trainer / new_total_hands if new_total_hands > 0 else 0
+    new_avg_energy = new_total_energy / new_total_hands if new_total_hands > 0 else 0
+    
+    # Update deck with accumulated test results
     await db.decks.update_one(
         {"id": deck_id},
         {"$set": {
             "test_results": {
-                "total_hands": test_results.total_hands,
-                "mulligan_count": test_results.mulligan_count,
-                "mulligan_percentage": test_results.mulligan_percentage,
-                "avg_pokemon": test_results.avg_pokemon,
-                "avg_trainer": test_results.avg_trainer,
-                "avg_energy": test_results.avg_energy,
+                "total_hands": new_total_hands,
+                "mulligan_count": new_mulligan_count,
+                "mulligan_percentage": round(new_mulligan_percentage, 1),
+                "avg_pokemon": round(new_avg_pokemon, 1),
+                "avg_trainer": round(new_avg_trainer, 1),
+                "avg_energy": round(new_avg_energy, 1),
                 "last_tested": datetime.now(timezone.utc).isoformat()
             }
         }}
     )
     
-    return {"message": "Test results saved successfully"}
+    return {
+        "message": "Test results saved successfully (accumulated)",
+        "total_hands": new_total_hands,
+        "mulligan_percentage": round(new_mulligan_percentage, 1)
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
