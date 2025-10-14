@@ -14,16 +14,37 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   const getCardData = (setCode, cardNumber, cardName) => {
     const cacheKey = `${setCode}-${cardNumber}`;
     
+    console.log(`Getting card data for ${cacheKey}`, {
+      hasCardData: !!cardData,
+      keysAvailable: cardData ? Object.keys(cardData).length : 0,
+      thisCardExists: cardData && cardData[cacheKey] ? 'YES' : 'NO'
+    });
+    
     // Get from cached data passed from parent
     if (cardData && cardData[cacheKey]) {
-      return cardData[cacheKey];
+      const data = cardData[cacheKey];
+      console.log(`  Found in cache:`, {
+        name: data.name,
+        supertype: data.supertype,
+        isPokemon: data.isPokemon,
+        isTrainer: data.isTrainer,
+        isEnergy: data.isEnergy
+      });
+      return data;
     }
     
-    // Return fallback if not found
+    console.log(`  NOT FOUND - using fallback`);
+    
+    // Return fallback if not found - try to guess type from card name
+    const isPokemon = !cardName.toLowerCase().includes('energy') && 
+                     !cardName.toLowerCase().match(/(professor|boss|iono|arven|nest ball|ultra ball|rare candy|switch|research)/);
+    const isTrainer = cardName.toLowerCase().match(/(professor|boss|iono|arven|nest ball|ultra ball|rare candy|switch|research|supporter|item|stadium|tool)/);
+    const isEnergy = cardName.toLowerCase().includes('energy');
+    
     return {
       name: cardName,
       image: null,
-      supertype: 'Unknown',
+      supertype: isPokemon ? 'Pokémon' : (isTrainer ? 'Trainer' : (isEnergy ? 'Energy' : 'Unknown')),
       subtypes: [],
       hp: null,
       types: [],
@@ -34,9 +55,9 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
       retreatCost: [],
       rules: [],
       isBasic: false,
-      isPokemon: false,
-      isTrainer: false,
-      isEnergy: false,
+      isPokemon: isPokemon,
+      isTrainer: isTrainer,
+      isEnergy: isEnergy,
       error: true
     };
   };
