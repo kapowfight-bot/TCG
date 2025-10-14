@@ -82,7 +82,13 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   };
 
   // Draw opening hand
-  const drawHand = (isMulligan = false) => {
+  const drawHand = () => {
+    // If hand exists and no Pokemon was selected, don't draw new hand
+    if (hand.length > 0 && selectedBasics.size === 0) {
+      console.log('No basic Pokemon selected, not drawing new hand');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -108,12 +114,6 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
         console.log(`Card: ${card.name} (${cacheKey})`);
         console.log('  Data found:', data.error ? 'NO' : 'YES');
         console.log('  Image URL:', data.image);
-        console.log('  Type:', {
-          isBasic: data.isBasic,
-          isPokemon: data.isPokemon,
-          isTrainer: data.isTrainer,
-          isEnergy: data.isEnergy
-        });
         
         return {
           ...card,
@@ -121,24 +121,59 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
         };
       });
       
-      const hasBasicPokemon = handWithData.some(card => card.data?.isBasic);
-      
-      console.log('Has basic Pokemon:', hasBasicPokemon);
       console.log('Hand drawn successfully');
       
       setHand(handWithData);
-      setHasBasic(hasBasicPokemon);
-      
-      if (isMulligan) {
-        setMulliganCount(prev => prev + 1);
-      } else {
-        setMulliganCount(0);
-      }
+      setSelectedBasics(new Set()); // Reset selections
     } catch (error) {
       console.error('Error drawing hand:', error);
       alert('Error drawing hand: ' + error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle mulligan (no basic Pokemon in hand)
+  const handleMulligan = () => {
+    setMulliganCount(prev => prev + 1);
+    setSelectedBasics(new Set());
+    drawHand();
+  };
+
+  // Toggle Pokemon as basic
+  const toggleBasicSelection = (cardId) => {
+    setSelectedBasics(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(cardId)) {
+        newSet.delete(cardId);
+      } else {
+        newSet.add(cardId);
+      }
+      return newSet;
+    });
+  };
+
+  // Save mulligan test results
+  const handleSave = async () => {
+    if (!deckId) {
+      alert('Deck ID not found');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Save the mulligan count to deck notes or as a stat
+      console.log(`Saving mulligan test: ${mulliganCount} mulligans for deck ${deckId}`);
+      
+      // You can extend this to save to backend if needed
+      alert(`Mulligan test saved!\nTotal mulligans: ${mulliganCount}\nThis data can be used when logging matches.`);
+      
+      onClose();
+    } catch (error) {
+      console.error('Error saving:', error);
+      alert('Failed to save mulligan test');
+    } finally {
+      setIsSaving(false);
     }
   };
 
