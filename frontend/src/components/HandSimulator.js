@@ -792,6 +792,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
                           console.log(`  Not a Pokemon, ignoring click`);
                         }
                       }}
+                      onMouseEnter={() => setHoveredCard(card)}
+                      onMouseLeave={() => setHoveredCard(null)}
                       className={`relative rounded-xl border-4 ${getBorderColor()} transition-all hover:scale-105 shadow-lg overflow-hidden bg-[#0a0a0b] ${
                         isPokemon ? 'cursor-pointer hover:border-emerald-400' : 'cursor-default'
                       }`}
