@@ -82,7 +82,7 @@ const Dashboard = ({ user, onLogout }) => {
     console.log(`Found ${uniqueCards.size} unique cards to fetch`);
     
     // Fetch all cards in parallel from our database
-    const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { cardName, setCode, cardNumber }]) => {
+    const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { cardName, setCode, cardNumber, section }]) => {
       try {
         // Try our local database first
         const response = await axios.get(
