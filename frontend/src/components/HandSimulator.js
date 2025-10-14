@@ -394,8 +394,10 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
   // Draw opening hand
   const drawHand = (forceDraw = false) => {
     // If hand exists and no Pokemon was selected, don't draw new hand (unless forced)
+    // This enforces: you must select at least one basic Pokemon before continuing
     if (!forceDraw && hand.length > 0 && selectedBasics.size === 0) {
       console.log('No basic Pokemon selected, not drawing new hand');
+      toast.error('Please select at least one Basic Pokemon before drawing a new hand!');
       return;
     }
     
