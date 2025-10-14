@@ -197,3 +197,5 @@ agent_communication:
     message: "Initialized test_result.md with current implementation state. Backend endpoints need testing first before frontend verification."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: Both critical backend tasks are now working correctly. Fixed Deck model to include test_results field. All test statistics endpoints are functional and tested with real data. Ready for frontend testing or main agent can summarize and finish if no frontend testing needed."
+  - agent: "main"
+    message: "Added Edit Deck feature. Backend: Updated PUT /api/decks/{deck_id} to reset test_results when deck_list changes. Frontend: Added Edit Deck button and dialog in DeckDetail.js with warning about test results reset. Ready for testing."
