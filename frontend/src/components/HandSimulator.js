@@ -61,6 +61,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     
     const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { setCode, cardNumber, section }]) => {
       try {
+        // Try local database first
         const response = await axios.get(
           `${API}/cards/${setCode}/${cardNumber}`,
           { withCredentials: true, timeout: 5000 }
@@ -89,9 +90,52 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
             section: section
           }
         };
-      } catch (error) {
-        console.error(`Failed to fetch ${cacheKey}:`, error.message);
-        return null;
+      } catch (localError) {
+        // Fallback to external Pokemon TCG API if not in local database
+        console.log(`Card ${cacheKey} not in local DB, trying external API...`);
+        
+        try {
+          let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+          let apiResponse;
+          
+          try {
+            apiResponse = await axios.get(apiUrl, { timeout: 5000 });
+          } catch (firstError) {
+            if (firstError.response?.status === 404) {
+              apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
+              apiResponse = await axios.get(apiUrl, { timeout: 5000 });
+            } else {
+              throw firstError;
+            }
+          }
+          
+          const card = apiResponse.data.data;
+          return {
+            cacheKey,
+            data: {
+              name: card.name,
+              image: card.images?.small || null,
+              supertype: card.supertype,
+              subtypes: card.subtypes || [],
+              hp: card.hp || null,
+              types: card.types || [],
+              abilities: card.abilities || [],
+              attacks: card.attacks || [],
+              weaknesses: card.weaknesses || [],
+              resistances: card.resistances || [],
+              retreatCost: card.retreatCost || [],
+              rules: card.rules || [],
+              isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+              isPokemon: section === 'pokemon',
+              isTrainer: section === 'trainer',
+              isEnergy: section === 'energy',
+              section: section
+            }
+          };
+        } catch (apiError) {
+          console.error(`Failed to fetch ${cacheKey} from both sources:`, apiError.message);
+          return null;
+        }
       }
     });
     
