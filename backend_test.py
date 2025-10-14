@@ -299,6 +299,67 @@ class PokemonTCGTrackerTester:
         
         return all_passed
 
+    def test_edit_deck_feature_without_auth(self):
+        """Test Edit Deck PUT endpoint without authentication"""
+        try:
+            deck_id = "79572d04-3a16-4c1a-b967-016d1d62b798"
+            update_data = {
+                "deck_name": "Updated Deck Name",
+                "deck_list": "4 Pikachu ex MEW 123\n3 Raichu VMAX SHF 45"
+            }
+            response = requests.put(
+                f"{self.api_url}/decks/{deck_id}",
+                json=update_data,
+                timeout=10
+            )
+            success = response.status_code == 401
+            self.log_test("Edit Deck (Unauthenticated)", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Edit Deck (Unauthenticated)", False, str(e))
+            return False
+
+    def test_edit_deck_endpoint_structure(self):
+        """Test Edit Deck endpoint accepts correct data structure"""
+        try:
+            deck_id = "79572d04-3a16-4c1a-b967-016d1d62b798"
+            # Test with partial update data
+            partial_data = {
+                "deck_name": "New Name Only"
+            }
+            response = requests.put(
+                f"{self.api_url}/decks/{deck_id}",
+                json=partial_data,
+                timeout=10
+            )
+            # Should fail due to missing auth, but we're testing if endpoint exists
+            success = response.status_code in [401, 422]  # 401 for auth, 422 for validation
+            self.log_test("Edit Deck Endpoint Structure", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Edit Deck Endpoint Structure", False, str(e))
+            return False
+
+    def test_edit_deck_nonexistent_deck(self):
+        """Test Edit Deck with non-existent deck ID"""
+        try:
+            fake_deck_id = "00000000-0000-0000-0000-000000000000"
+            update_data = {
+                "deck_name": "Updated Name"
+            }
+            response = requests.put(
+                f"{self.api_url}/decks/{fake_deck_id}",
+                json=update_data,
+                timeout=10
+            )
+            # Should fail due to auth first, but endpoint should exist
+            success = response.status_code in [401, 404]
+            self.log_test("Edit Deck (Non-existent)", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Edit Deck (Non-existent)", False, str(e))
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Pokemon TCG Tracker Backend Tests")
