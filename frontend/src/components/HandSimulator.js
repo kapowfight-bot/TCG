@@ -537,7 +537,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
       });
       
       // Save to backend
-      await axios.post(
+      const response = await axios.post(
         `${API}/decks/${deckId}/test-results`,
         {
           total_hands: testStats.totalHandsDrawn,
@@ -550,8 +550,12 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         { withCredentials: true }
       );
       
+      // Show accumulated totals in success message
+      const totalHands = response.data.total_hands;
+      const totalMulliganPct = response.data.mulligan_percentage;
+      
       toast.success(
-        `Test saved!\n${testStats.totalHandsDrawn} hands • ${mulliganPercentage}% mulligan\nAvg: ${avgPokemon} Pokemon, ${avgTrainer} Trainer, ${avgEnergy} Energy`
+        `Test saved! Session: ${testStats.totalHandsDrawn} hands\nTotal accumulated: ${totalHands} hands • ${totalMulliganPct}% mulligan rate`
       );
       
       // Reset test stats
