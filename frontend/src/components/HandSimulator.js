@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import axios from 'axios';
 
 const HandSimulator = ({ deckList, isOpen, onClose }) => {
   const [hand, setHand] = useState([]);
