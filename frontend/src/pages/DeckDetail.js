@@ -90,6 +90,7 @@ const DeckDetail = ({ user, onLogout }) => {
       setOpponentDeck('');
       setMatchNotes('');
       setBadGame(false);
+      setMulliganCount(0);
       setIsMatchDialogOpen(false);
       fetchDeckData();
     } catch (error) {
