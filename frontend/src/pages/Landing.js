@@ -42,7 +42,7 @@ const Landing = ({ onAuth }) => {
 
   const handleLogin = () => {
     const authUrl = process.env.REACT_APP_AUTH_URL || 'https://auth.emergentagent.com';
-    const redirectUrl = `${window.location.origin}/dashboard`;
+    const redirectUrl = `${window.location.origin}/`;
     window.location.href = `${authUrl}/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
