@@ -528,11 +528,9 @@ const DeckDetail = ({ user, onLogout }) => {
         <HandSimulator
           deckList={deck.deck_list}
           cardData={deck.card_data || {}}
+          deckId={deck.id}
           isOpen={isSimulatorOpen}
-          onClose={() => {
-            console.log('Deck card_data:', deck.card_data ? Object.keys(deck.card_data).length + ' cards' : 'No card data');
-            setIsSimulatorOpen(false);
-          }}
+          onClose={() => setIsSimulatorOpen(false)}
         />
       )}
     </div>
