@@ -1,6 +1,6 @@
 {
-  "total_tests": 23,
-  "passed_tests": 23,
+  "total_tests": 26,
+  "passed_tests": 26,
   "failed_tests": 0,
   "success_rate": 100.0,
   "test_results": [
@@ -118,6 +118,21 @@
       "test": "Endpoint Exists: GET /cards/count",
       "success": true,
       "details": "Status: 200"
+    },
+    {
+      "test": "Edit Deck (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Edit Deck Endpoint Structure",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Edit Deck (Non-existent)",
+      "success": true,
+      "details": "Status: 401"
     }
   ]
 }
