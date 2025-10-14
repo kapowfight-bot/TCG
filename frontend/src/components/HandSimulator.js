@@ -140,11 +140,35 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     });
     
     const results = await Promise.all(fetchPromises);
+    
+    // Track which cards came from external API (need to be saved to DB)
+    const cardsToSave = {};
+    
     results.forEach(result => {
       if (result) {
         cardDataMap[result.cacheKey] = result.data;
+        // If card has 'fromExternalAPI' flag, add to batch save
+        if (result.fromExternalAPI) {
+          cardsToSave[result.cacheKey] = result.data;
+        }
       }
     });
+    
+    // Save newly fetched cards to local database for future use
+    if (Object.keys(cardsToSave).length > 0) {
+      try {
+        console.log(`Saving ${Object.keys(cardsToSave).length} new cards to local database...`);
+        await axios.post(
+          `${API}/cards/batch`,
+          cardsToSave,
+          { withCredentials: true, timeout: 10000 }
+        );
+        console.log('Cards saved to local database successfully');
+      } catch (saveError) {
+        console.error('Failed to save cards to database:', saveError);
+        // Don't fail the whole operation if saving fails
+      }
+    }
     
     return cardDataMap;
   };
