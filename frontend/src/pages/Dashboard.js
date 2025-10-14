@@ -515,6 +515,8 @@ const Dashboard = ({ user, onLogout }) => {
                         <span className="text-gray-400">Avg: </span>
                         <span className="font-semibold text-green-400">{deck.test_results.avg_pokemon}P</span>
                         <span className="text-gray-600"> / </span>
+                        <span className="font-semibold text-emerald-400">{deck.test_results.avg_basic_pokemon || 0}B</span>
+                        <span className="text-gray-600"> / </span>
                         <span className="font-semibold text-blue-400">{deck.test_results.avg_trainer}T</span>
                         <span className="text-gray-600"> / </span>
                         <span className="font-semibold text-yellow-400">{deck.test_results.avg_energy}E</span>
