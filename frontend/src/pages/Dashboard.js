@@ -60,9 +60,17 @@ const Dashboard = ({ user, onLogout }) => {
           const card = response.data.data;
           cardDataMap[cacheKey] = {
             name: card.name,
-            image: card.images.small,
+            image: card.images?.small || null,
             supertype: card.supertype,
             subtypes: card.subtypes || [],
+            hp: card.hp || null,
+            types: card.types || [],
+            abilities: card.abilities || [],
+            attacks: card.attacks || [],
+            weaknesses: card.weaknesses || [],
+            resistances: card.resistances || [],
+            retreatCost: card.retreatCost || [],
+            rules: card.rules || [],
             isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
             isPokemon: card.supertype === 'Pokémon',
             isTrainer: card.supertype === 'Trainer',
