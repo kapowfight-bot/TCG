@@ -110,21 +110,52 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
     
     try {
       const cards = parseDeckList(deckList);
+      
+      if (cards.length === 0) {
+        alert('No cards found in deck list. Make sure the format is correct (e.g., "4 Pikachu SVI 78")');
+        setIsLoading(false);
+        return;
+      }
+      
       const shuffled = shuffle(cards);
       const drawnHand = shuffled.slice(0, 7);
       
-      // Fetch card data for each card in hand
-      const handWithData = await Promise.all(
-        drawnHand.map(async (card) => {
-          const cardData = await fetchCardData(card.setCode, card.cardNumber);
-          return {
+      console.log('Drawing hand with cards:', drawnHand.map(c => `${c.name} ${c.setCode} ${c.cardNumber}`));
+      
+      // Fetch card data for each card in hand with progress tracking
+      const handWithData = [];
+      for (let i = 0; i < drawnHand.length; i++) {
+        const card = drawnHand[i];
+        try {
+          const cardData = await fetchCardData(card.setCode, card.cardNumber, card.name);
+          handWithData.push({
             ...card,
             data: cardData
-          };
-        })
-      );
+          });
+          console.log(`Loaded card ${i + 1}/7: ${card.name}`);
+        } catch (error) {
+          console.error(`Failed to load card ${i + 1}:`, error);
+          // Add card with fallback data
+          handWithData.push({
+            ...card,
+            data: {
+              name: card.name,
+              image: null,
+              supertype: 'Unknown',
+              subtypes: [],
+              isBasic: false,
+              isPokemon: false,
+              isTrainer: false,
+              isEnergy: false,
+              error: true
+            }
+          });
+        }
+      }
       
       const hasBasicPokemon = handWithData.some(card => card.data?.isBasic);
+      
+      console.log('Hand loaded. Basic Pokemon found:', hasBasicPokemon);
       
       setHand(handWithData);
       setHasBasic(hasBasicPokemon);
@@ -136,6 +167,7 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Error drawing hand:', error);
+      alert('Error drawing hand: ' + error.message);
     } finally {
       setIsLoading(false);
     }
