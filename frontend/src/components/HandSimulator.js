@@ -9,6 +9,15 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   const [selectedBasics, setSelectedBasics] = useState(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Test statistics tracking
+  const [testStats, setTestStats] = useState({
+    totalHandsDrawn: 0,
+    totalPokemon: 0,
+    totalTrainer: 0,
+    totalEnergy: 0,
+    totalCards: 0
+  });
 
   // Get card data from cached data
   const getCardData = (setCode, cardNumber, cardName) => {
