@@ -154,9 +154,11 @@ const Dashboard = ({ user, onLogout }) => {
               retreatCost: card.retreatCost || [],
               rules: card.rules || [],
               isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
-              isPokemon: card.supertype === 'Pokémon',
-              isTrainer: card.supertype === 'Trainer',
-              isEnergy: card.supertype === 'Energy'
+              // Use section from deck list for type (more reliable)
+              isPokemon: section === 'pokemon',
+              isTrainer: section === 'trainer',
+              isEnergy: section === 'energy',
+              section: section // Store section info
             }
           };
         } catch (apiError) {
