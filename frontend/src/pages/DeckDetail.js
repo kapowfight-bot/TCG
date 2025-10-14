@@ -522,6 +522,15 @@ const DeckDetail = ({ user, onLogout }) => {
           )}
         </div>
       </main>
+
+      {/* Hand Simulator */}
+      {deck && (
+        <HandSimulator
+          deckList={deck.deck_list}
+          isOpen={isSimulatorOpen}
+          onClose={() => setIsSimulatorOpen(false)}
+        />
+      )}
     </div>
   );
 };
