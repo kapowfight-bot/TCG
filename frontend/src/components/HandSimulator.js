@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { API } from '../App';
 
 const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   const [hand, setHand] = useState([]);
