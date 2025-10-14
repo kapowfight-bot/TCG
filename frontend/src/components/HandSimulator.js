@@ -181,7 +181,11 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
                     className={`bg-[#0f0f10] rounded-xl p-4 border-2 ${
                       card.isBasic 
                         ? 'border-emerald-500/50 bg-emerald-500/5' 
-                        : 'border-gray-700'
+                        : card.isEnergy
+                        ? 'border-yellow-500/50 bg-yellow-500/5'
+                        : card.isTrainer
+                        ? 'border-blue-500/50 bg-blue-500/5'
+                        : 'border-purple-500/50 bg-purple-500/5'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -189,6 +193,21 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
                       {card.isBasic && (
                         <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">
                           Basic
+                        </span>
+                      )}
+                      {card.isEnergy && (
+                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">
+                          Energy
+                        </span>
+                      )}
+                      {card.isTrainer && (
+                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+                          Trainer
+                        </span>
+                      )}
+                      {!card.isBasic && !card.isEnergy && !card.isTrainer && (
+                        <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">
+                          Evolved
                         </span>
                       )}
                     </div>
