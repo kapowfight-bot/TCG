@@ -310,6 +310,23 @@ const DeckDetail = ({ user, onLogout }) => {
                     </div>
 
                     <div>
+                      <Label htmlFor="mulligan-count" className="text-gray-300 mb-2 block">
+                        Mulligan Count
+                      </Label>
+                      <Input
+                        id="mulligan-count"
+                        data-testid="mulligan-count-input"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        value={mulliganCount}
+                        onChange={(e) => setMulliganCount(parseInt(e.target.value) || 0)}
+                        className="bg-[#0f0f10] border-gray-700 text-white"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">How many times did you mulligan?</p>
+                    </div>
+
+                    <div>
                       <Label htmlFor="notes" className="text-gray-300 mb-2 block">
                         Notes (optional)
                       </Label>
