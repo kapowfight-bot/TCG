@@ -181,7 +181,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   const reset = () => {
     setHand([]);
     setMulliganCount(0);
-    setHasBasic(false);
+    setSelectedBasics(new Set());
   };
 
   return (
