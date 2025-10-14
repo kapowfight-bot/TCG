@@ -131,9 +131,9 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   };
 
   // Draw opening hand
-  const drawHand = () => {
-    // If hand exists and no Pokemon was selected, don't draw new hand
-    if (hand.length > 0 && selectedBasics.size === 0) {
+  const drawHand = (forceDraw = false) => {
+    // If hand exists and no Pokemon was selected, don't draw new hand (unless forced)
+    if (!forceDraw && hand.length > 0 && selectedBasics.size === 0) {
       console.log('No basic Pokemon selected, not drawing new hand');
       return;
     }
