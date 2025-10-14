@@ -661,8 +661,8 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
         if not deck:
             raise HTTPException(status_code=404, detail="Deck not found")
         
-        # Get existing test results (if any)
-        existing_results = deck.get("test_results", {})
+        # Get existing test results (if any) - ensure it's a dict, not None
+        existing_results = deck.get("test_results") or {}
     except HTTPException:
         raise
     except Exception as e:
@@ -670,12 +670,12 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
         raise HTTPException(status_code=500, detail=f"Error loading deck: {str(e)}")
     
     try:
-        # Calculate accumulated totals
-        old_total_hands = existing_results.get("total_hands", 0)
-        old_mulligan_count = existing_results.get("mulligan_count", 0)
-        old_total_pokemon = existing_results.get("avg_pokemon", 0) * old_total_hands
-        old_total_trainer = existing_results.get("avg_trainer", 0) * old_total_hands
-        old_total_energy = existing_results.get("avg_energy", 0) * old_total_hands
+        # Calculate accumulated totals - handle None/missing values
+        old_total_hands = existing_results.get("total_hands", 0) if existing_results else 0
+        old_mulligan_count = existing_results.get("mulligan_count", 0) if existing_results else 0
+        old_total_pokemon = (existing_results.get("avg_pokemon", 0) if existing_results else 0) * old_total_hands
+        old_total_trainer = (existing_results.get("avg_trainer", 0) if existing_results else 0) * old_total_hands
+        old_total_energy = (existing_results.get("avg_energy", 0) if existing_results else 0) * old_total_hands
         
         # Add new test results to existing
         new_total_hands = old_total_hands + test_results.total_hands
