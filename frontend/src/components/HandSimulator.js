@@ -195,31 +195,30 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
           {/* Instructions */}
           <div className="space-y-4">
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-              <h3 className="font-semibold text-blue-400 mb-2">Pokemon TCG Mulligan Rule</h3>
-              <p className="text-sm text-gray-300">
-                If you don't have a Basic Pokemon in your opening hand, you must mulligan (shuffle and redraw).
-                Your opponent draws 1 card for each mulligan.
-              </p>
+              <h3 className="font-semibold text-blue-400 mb-2">How to Use</h3>
+              <ol className="text-sm text-gray-300 space-y-1 list-decimal list-inside">
+                <li>Click "Draw Opening Hand" to draw 7 cards</li>
+                <li>Click on Pokemon cards that are Basic Pokemon</li>
+                <li>If no Basic Pokemon: Click "Mulligan" button</li>
+                <li>If you have Basic Pokemon: Click "Draw Opening Hand" again to continue</li>
+                <li>When done testing: Click "Save" to store mulligan count</li>
+              </ol>
             </div>
             
             <div className="bg-[#0f0f10] rounded-xl p-4">
-              <h3 className="font-semibold mb-3">Card Type Legend</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <h3 className="font-semibold mb-3">Card Type Colors</h3>
+              <div className="grid grid-cols-3 gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                  <span>Basic Pokemon</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                  <span>Evolved Pokemon</span>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span>Pokemon</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                  <span>Trainer Cards</span>
+                  <span>Trainer</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <span>Energy Cards</span>
+                  <span>Energy</span>
                 </div>
               </div>
             </div>
