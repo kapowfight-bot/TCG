@@ -506,6 +506,37 @@ async def get_deck_stats(deck_id: str, request: Request):
         opponent_stats=opponent_stats
     )
 
+@api_router.get("/cards/{set_code}/{card_number}")
+async def get_card_from_db(set_code: str, card_number: str):
+    """Get card from local database"""
+    # Try exact match first
+    card = await db.pokemon_cards.find_one(
+        {
+            "set_code": set_code.upper(),
+            "card_number": card_number
+        },
+        {"_id": 0}
+    )
+    
+    if not card:
+        # Try with card_id format
+        card_id = f"{set_code.lower()}-{card_number}"
+        card = await db.pokemon_cards.find_one(
+            {"card_id": card_id},
+            {"_id": 0}
+        )
+    
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found in database")
+    
+    return card
+
+@api_router.get("/cards/count")
+async def get_cards_count():
+    """Get total number of cards in database"""
+    count = await db.pokemon_cards.count_documents({})
+    return {"count": count}
+
 # Include the router in the main app
 app.include_router(api_router)
 
