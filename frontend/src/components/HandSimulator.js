@@ -112,6 +112,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
           const card = apiResponse.data.data;
           return {
             cacheKey,
+            fromExternalAPI: true,  // Mark this card for database saving
             data: {
               name: card.name,
               image: card.images?.small || null,
