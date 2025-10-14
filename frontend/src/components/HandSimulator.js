@@ -1,0 +1,227 @@
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Card } from './ui/card';
+
+const HandSimulator = ({ deckList, isOpen, onClose }) => {
+  const [hand, setHand] = useState([]);
+  const [mulliganCount, setMulliganCount] = useState(0);
+  const [hasBasic, setHasBasic] = useState(false);
+
+  // Parse deck list into card objects
+  const parseDeckList = (deckListText) => {
+    const cards = [];
+    const lines = deckListText.split('\n').filter(line => line.trim());
+    
+    for (const line of lines) {
+      // PTCGL format: "4 Pikachu ex MEW 123"
+      const match = line.match(/^(\d+)\s+(.+?)(?:\s+[A-Z]+\s+\d+)?$/);
+      if (match) {
+        const count = parseInt(match[1]);
+        const cardName = match[2].trim();
+        
+        for (let i = 0; i < count; i++) {
+          cards.push({
+            name: cardName,
+            id: `${cardName}-${i}`,
+            // Check if it's a Basic Pokemon (not ex, V, VMAX, VSTAR, GX, etc.)
+            isBasic: !cardName.match(/\s+(ex|V|VMAX|VSTAR|GX|EX|Tag Team|&)/i) && 
+                     !cardName.match(/^(Professor|Boss|Rare Candy|Energy|Ultra Ball|Nest Ball|Great Ball|Poké Ball)/i)
+          });
+        }
+      }
+    }
+    
+    return cards;
+  };
+
+  // Shuffle array
+  const shuffle = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Draw opening hand
+  const drawHand = (isMulligan = false) => {
+    const cards = parseDeckList(deckList);
+    const shuffled = shuffle(cards);
+    const drawnHand = shuffled.slice(0, 7);
+    
+    const hasBasicPokemon = drawnHand.some(card => card.isBasic);
+    
+    setHand(drawnHand);
+    setHasBasic(hasBasicPokemon);
+    
+    if (isMulligan) {
+      setMulliganCount(prev => prev + 1);
+    } else {
+      setMulliganCount(0);
+    }
+  };
+
+  // Reset simulator
+  const reset = () => {
+    setHand([]);
+    setMulliganCount(0);
+    setHasBasic(false);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="bg-[#1a1a1b] border-gray-800 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl">Opening Hand Simulator</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 mt-4">
+          {/* Instructions */}
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+            <h3 className="font-semibold text-blue-400 mb-2">Pokemon TCG Mulligan Rule</h3>
+            <p className="text-sm text-gray-300">
+              If you don't have a Basic Pokemon in your opening hand, you must mulligan (shuffle and redraw).
+              Your opponent draws 1 card for each mulligan.
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-wrap gap-3">
+            <Button
+              data-testid="draw-hand-btn"
+              onClick={() => drawHand(false)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
+            >
+              Draw Opening Hand
+            </Button>
+            
+            {hand.length > 0 && !hasBasic && (
+              <Button
+                data-testid="mulligan-btn"
+                onClick={() => drawHand(true)}
+                className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl"
+              >
+                Mulligan
+              </Button>
+            )}
+            
+            {hand.length > 0 && (
+              <Button
+                onClick={reset}
+                variant="outline"
+                className="border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
+              >
+                Reset
+              </Button>
+            )}
+          </div>
+
+          {/* Mulligan Counter */}
+          {mulliganCount > 0 && (
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-orange-400 font-semibold">
+                  Mulligans: {mulliganCount}
+                </span>
+                <span className="text-sm text-gray-400">
+                  Opponent draws {mulliganCount} card{mulliganCount !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Hand Display */}
+          {hand.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold">Your Hand (7 cards)</h3>
+                <div className={`px-4 py-2 rounded-xl font-semibold ${
+                  hasBasic 
+                    ? 'bg-emerald-500/20 text-emerald-400' 
+                    : 'bg-red-500/20 text-red-400'
+                }`}>
+                  {hasBasic ? '✓ Has Basic Pokemon' : '✗ No Basic Pokemon'}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {hand.map((card, index) => (
+                  <div
+                    key={card.id}
+                    data-testid={`hand-card-${index}`}
+                    className={`bg-[#0f0f10] rounded-xl p-4 border-2 ${
+                      card.isBasic 
+                        ? 'border-emerald-500/50 bg-emerald-500/5' 
+                        : 'border-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <span className="text-xs text-gray-500">#{index + 1}</span>
+                      {card.isBasic && (
+                        <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">
+                          Basic
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm font-medium break-words">{card.name}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Statistics */}
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Total Cards</div>
+                  <div className="text-2xl font-bold">7</div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Basic Pokemon</div>
+                  <div className="text-2xl font-bold text-emerald-500">
+                    {hand.filter(c => c.isBasic).length}
+                  </div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Other Cards</div>
+                  <div className="text-2xl font-bold">
+                    {hand.filter(c => !c.isBasic).length}
+                  </div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Mulligans</div>
+                  <div className="text-2xl font-bold text-orange-400">{mulliganCount}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {hand.length === 0 && (
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gray-800/50 rounded-2xl flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-400 mb-4">Click "Draw Opening Hand" to test your deck's consistency</p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default HandSimulator;
