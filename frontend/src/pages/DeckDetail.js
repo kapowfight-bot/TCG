@@ -219,7 +219,45 @@ const DeckDetail = ({ user, onLogout }) => {
           };
         } catch (apiError) {
           console.error(`Failed to fetch ${cacheKey} from both sources:`, apiError.message);
-          return null;
+          console.log(`  → Creating basic card entry from deck list info`);
+          
+          // Extract card name from deck list
+          const lines = deckListText.split('\n');
+          let cardName = 'Unknown Card';
+          for (const line of lines) {
+            const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+            if (match && `${match[3].toUpperCase()}-${match[4]}` === cacheKey) {
+              cardName = match[2].trim();
+              break;
+            }
+          }
+          
+          // Create basic card entry from deck list information
+          const supertype = section === 'pokemon' ? 'Pokémon' : (section === 'trainer' ? 'Trainer' : 'Energy');
+          
+          return {
+            cacheKey,
+            fromDeckListOnly: true,  // Mark for database saving with basic info
+            data: {
+              name: cardName,
+              image: null,  // No image available
+              supertype: supertype,
+              subtypes: [],
+              hp: null,
+              types: [],
+              abilities: [],
+              attacks: [],
+              weaknesses: [],
+              resistances: [],
+              retreatCost: [],
+              rules: [],
+              isBasic: false,  // Can't determine without API
+              isPokemon: section === 'pokemon',
+              isTrainer: section === 'trainer',
+              isEnergy: section === 'energy',
+              section: section
+            }
+          };
         }
       }
     });
@@ -232,8 +270,8 @@ const DeckDetail = ({ user, onLogout }) => {
     results.forEach(result => {
       if (result) {
         cardDataMap[result.cacheKey] = result.data;
-        // If card has 'fromExternalAPI' flag, add to batch save
-        if (result.fromExternalAPI) {
+        // If card has 'fromExternalAPI' or 'fromDeckListOnly' flag, add to batch save
+        if (result.fromExternalAPI || result.fromDeckListOnly) {
           cardsToSave[result.cacheKey] = result.data;
         }
       }
