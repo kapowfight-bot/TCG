@@ -98,6 +98,7 @@ class MatchUpdate(BaseModel):
     opponent_deck_name: Optional[str] = None
     went_first: Optional[bool] = None
     bad_game: Optional[bool] = None
+    mulligan_count: Optional[int] = None
     notes: Optional[str] = None
 
 class DeckStats(BaseModel):
