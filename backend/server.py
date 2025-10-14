@@ -61,6 +61,7 @@ class Match(BaseModel):
     opponent_deck_name: str
     went_first: bool
     bad_game: bool = False
+    mulligan_count: int = 0
     notes: Optional[str] = None
     match_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
