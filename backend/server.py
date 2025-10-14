@@ -111,6 +111,8 @@ class DeckStats(BaseModel):
     went_first_losses: int
     went_second_wins: int
     went_second_losses: int
+    avg_mulligans: float
+    total_mulligans: int
     opponent_stats: dict
 
 # Helper function to get user from session
