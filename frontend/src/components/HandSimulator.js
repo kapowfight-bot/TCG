@@ -22,6 +22,131 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     totalCards: 0
   });
 
+  // Fetch card data for the deck
+  const fetchCardDataForDeck = async (deckListText) => {
+    const cardDataMap = {};
+    const lines = deckListText.split('\n');
+    
+    const uniqueCards = new Map();
+    let currentSection = 'unknown';
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+      
+      if (trimmedLine.match(/^Pokémon:/i) || trimmedLine.match(/^Pokemon:/i)) {
+        currentSection = 'pokemon';
+        continue;
+      }
+      if (trimmedLine.match(/^Trainer:/i)) {
+        currentSection = 'trainer';
+        continue;
+      }
+      if (trimmedLine.match(/^Energy:/i)) {
+        currentSection = 'energy';
+        continue;
+      }
+      
+      const match = trimmedLine.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+      if (match) {
+        const setCode = match[3].toUpperCase();
+        const cardNumber = match[4];
+        const cacheKey = `${setCode}-${cardNumber}`;
+        
+        if (!uniqueCards.has(cacheKey)) {
+          uniqueCards.set(cacheKey, { setCode, cardNumber, section: currentSection });
+        }
+      }
+    }
+    
+    const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { setCode, cardNumber, section }]) => {
+      try {
+        const response = await axios.get(
+          `${API}/cards/${setCode}/${cardNumber}`,
+          { withCredentials: true, timeout: 5000 }
+        );
+        
+        const card = response.data;
+        return {
+          cacheKey,
+          data: {
+            name: card.name,
+            image: card.image_small || null,
+            supertype: card.supertype,
+            subtypes: card.subtypes || [],
+            hp: card.hp || null,
+            types: card.types || [],
+            abilities: card.abilities || [],
+            attacks: card.attacks || [],
+            weaknesses: card.weaknesses || [],
+            resistances: card.resistances || [],
+            retreatCost: card.retreat_cost || [],
+            rules: card.rules || [],
+            isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+            isPokemon: section === 'pokemon',
+            isTrainer: section === 'trainer',
+            isEnergy: section === 'energy',
+            section: section
+          }
+        };
+      } catch (error) {
+        console.error(`Failed to fetch ${cacheKey}:`, error.message);
+        return null;
+      }
+    });
+    
+    const results = await Promise.all(fetchPromises);
+    results.forEach(result => {
+      if (result) {
+        cardDataMap[result.cacheKey] = result.data;
+      }
+    });
+    
+    return cardDataMap;
+  };
+
+  // Handle refreshing card data for old decks
+  const handleRefreshCardData = async () => {
+    setIsRefreshing(true);
+    try {
+      toast.info('Fetching card data...');
+      const newCardData = await fetchCardDataForDeck(deckList);
+      
+      if (Object.keys(newCardData).length === 0) {
+        toast.error('Failed to fetch card data');
+        setIsRefreshing(false);
+        return;
+      }
+      
+      toast.success(`Fetched ${Object.keys(newCardData).length} cards`);
+      
+      // Update deck with new card data
+      await axios.put(
+        `${API}/decks/${deckId}`,
+        { card_data: newCardData },
+        { withCredentials: true }
+      );
+      
+      toast.success('Card data updated! Closing simulator...');
+      
+      // Notify parent to refresh deck data
+      if (onDeckUpdate) {
+        onDeckUpdate();
+      }
+      
+      // Close and let parent refresh
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error refreshing card data:', error);
+      toast.error('Failed to refresh card data');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   // Get card data from cached data
   const getCardData = (setCode, cardNumber, cardName) => {
     const cacheKey = `${setCode}-${cardNumber}`;
