@@ -10,53 +10,74 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [cardCache, setCardCache] = useState({});
 
-  // Parse deck list into card objects
+  // Fetch card data from Pokemon TCG API
+  const fetchCardData = async (setCode, cardNumber) => {
+    const cacheKey = `${setCode}-${cardNumber}`;
+    
+    // Check cache first
+    if (cardCache[cacheKey]) {
+      return cardCache[cacheKey];
+    }
+    
+    try {
+      const response = await axios.get(
+        `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`
+      );
+      
+      const card = response.data.data;
+      const cardData = {
+        name: card.name,
+        image: card.images.small,
+        supertype: card.supertype, // "Pokémon", "Trainer", "Energy"
+        subtypes: card.subtypes || [], // ["Basic"], ["Stage 1"], ["Stage 2"], ["Item"], etc.
+        isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+        isPokemon: card.supertype === 'Pokémon',
+        isTrainer: card.supertype === 'Trainer',
+        isEnergy: card.supertype === 'Energy'
+      };
+      
+      // Cache the result
+      setCardCache(prev => ({ ...prev, [cacheKey]: cardData }));
+      
+      return cardData;
+    } catch (error) {
+      console.error('Error fetching card:', error);
+      // Return fallback data
+      return {
+        name: 'Unknown Card',
+        image: null,
+        supertype: 'Unknown',
+        subtypes: [],
+        isBasic: false,
+        isPokemon: false,
+        isTrainer: false,
+        isEnergy: false
+      };
+    }
+  };
+
+  // Parse deck list into card objects with set codes
   const parseDeckList = (deckListText) => {
     const cards = [];
     const lines = deckListText.split('\n').filter(line => line.trim());
     
-    // Trainer/Supporter/Item/Stadium keywords
-    const trainerKeywords = [
-      'Professor', 'Boss', 'Ball', 'Candy', 'Switch', 'Potion', 'Stadium',
-      'Research', 'Letter', 'Nest', 'Ultra', 'Great', 'Master', 'Level',
-      'Super Rod', 'VS Seeker', 'Town', 'Path', 'Escape Rope', 'Iono',
-      'Arven', 'Miriam', 'Pepper', 'Counter Catcher', 'Prime Catcher',
-      'Technical Machine', 'Beach', 'Temple', 'Court', 'Festival',
-      'Defiance Band', 'Hero\'s Cape', 'Bravery Charm', 'Muscle Band',
-      'Choice Belt', 'Rare Candy', 'Pal Pad', 'Ancient Booster', 'Future Booster'
-    ];
-    
     for (const line of lines) {
-      // PTCGL format: "4 Pikachu ex MEW 123" or "4 Pikachu MEW 123"
-      const match = line.match(/^(\d+)\s+(.+?)(?:\s+[A-Z]{2,}\s+\d+)?$/);
+      // PTCGL format: "4 Pikachu ex SVI 78" or "4 Professor's Research SVI 189"
+      // Match: count, card name, set code (2-4 letters), card number
+      const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
       if (match) {
         const count = parseInt(match[1]);
         const cardName = match[2].trim();
-        
-        // Check if it's an Energy card
-        const isEnergy = cardName.includes('Energy');
-        
-        // Check if it's a Trainer/Supporter/Item/Stadium card
-        const isTrainer = trainerKeywords.some(keyword => 
-          cardName.includes(keyword)
-        );
-        
-        // Check if it's an evolved/special Pokemon (ex, V, VMAX, etc.)
-        const isEvolved = /\s+(ex|V|VMAX|VSTAR|GX|EX|Tag Team|&|BREAK|Prime)$/i.test(cardName);
-        
-        // A Basic Pokemon is:
-        // - Not an Energy card
-        // - Not a Trainer card
-        // - Not an evolved/special Pokemon
-        const isBasic = !isEnergy && !isTrainer && !isEvolved;
+        const setCode = match[3].toUpperCase();
+        const cardNumber = match[4];
         
         for (let i = 0; i < count; i++) {
           cards.push({
             name: cardName,
-            id: `${cardName}-${i}`,
-            isBasic: isBasic,
-            isEnergy: isEnergy,
-            isTrainer: isTrainer
+            setCode: setCode,
+            cardNumber: cardNumber,
+            id: `${setCode}-${cardNumber}-${i}`,
+            data: null // Will be populated when drawing
           });
         }
       }
