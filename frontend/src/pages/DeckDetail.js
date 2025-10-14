@@ -36,8 +36,10 @@ const DeckDetail = ({ user, onLogout }) => {
   const [opponentDeck, setOpponentDeck] = useState('');
   const [wentFirst, setWentFirst] = useState(true);
   const [badGame, setBadGame] = useState(false);
+  const [mulliganCount, setMulliganCount] = useState(0);
   const [matchNotes, setMatchNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
   useEffect(() => {
     fetchDeckData();
