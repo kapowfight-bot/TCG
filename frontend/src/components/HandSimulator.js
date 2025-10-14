@@ -214,8 +214,7 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-                <p className="text-gray-400 text-lg">Loading cards from Pokemon TCG API...</p>
-                <p className="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+                <p className="text-gray-400 text-lg">Drawing hand...</p>
               </div>
             </div>
           )}
