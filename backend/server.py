@@ -85,6 +85,7 @@ class DeckCreate(BaseModel):
 class DeckUpdate(BaseModel):
     deck_name: Optional[str] = None
     deck_list: Optional[str] = None
+    card_data: Optional[dict] = None
 
 class MatchCreate(BaseModel):
     deck_id: str
