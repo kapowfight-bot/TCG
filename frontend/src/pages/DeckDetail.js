@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../components/ui/alert-dialog';
+import HandSimulator from '../components/HandSimulator';
 
 const DeckDetail = ({ user, onLogout }) => {
   const { deckId } = useParams();
