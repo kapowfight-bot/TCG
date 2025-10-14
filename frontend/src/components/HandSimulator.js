@@ -141,14 +141,18 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   };
 
   // Toggle Pokemon as basic
-  const toggleBasicSelection = (cardId) => {
+  const toggleBasicSelection = (cardId, cardName) => {
+    console.log(`Toggling card: ${cardName} (${cardId})`);
     setSelectedBasics(prev => {
       const newSet = new Set(prev);
       if (newSet.has(cardId)) {
+        console.log(`  Removing from selection`);
         newSet.delete(cardId);
       } else {
+        console.log(`  Adding to selection`);
         newSet.add(cardId);
       }
+      console.log(`  Total selected: ${newSet.size}`);
       return newSet;
     });
   };
