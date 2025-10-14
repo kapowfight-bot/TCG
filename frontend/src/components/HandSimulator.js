@@ -91,6 +91,14 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
       // Get card data from cache for each card in hand
       const handWithData = drawnHand.map(card => {
         const data = getCardData(card.setCode, card.cardNumber, card.name);
+        console.log(`Card: ${card.name} (${card.setCode}-${card.cardNumber})`, {
+          isBasic: data.isBasic,
+          isPokemon: data.isPokemon,
+          isTrainer: data.isTrainer,
+          isEnergy: data.isEnergy,
+          supertype: data.supertype,
+          subtypes: data.subtypes
+        });
         return {
           ...card,
           data: data
@@ -98,6 +106,9 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
       });
       
       const hasBasicPokemon = handWithData.some(card => card.data?.isBasic);
+      
+      console.log('Hand with data:', handWithData);
+      console.log('Has basic Pokemon:', hasBasicPokemon);
       
       setHand(handWithData);
       setHasBasic(hasBasicPokemon);
