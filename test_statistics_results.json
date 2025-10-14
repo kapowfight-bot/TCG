@@ -1,8 +1,8 @@
 {
   "total_tests": 7,
-  "passed_tests": 5,
-  "failed_tests": 2,
-  "success_rate": 71.42857142857143,
+  "passed_tests": 7,
+  "failed_tests": 0,
+  "success_rate": 100.0,
   "test_results": [
     {
       "test": "Auth Me (Authenticated)",
@@ -21,7 +21,7 @@
     },
     {
       "test": "Verify Test Results Saved",
-      "success": false,
+      "success": true,
       "details": "Status: 200"
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       "test": "Decks List Includes Test Results",
-      "success": false,
+      "success": true,
       "details": "Status: 200"
     }
   ]
