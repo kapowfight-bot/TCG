@@ -398,6 +398,11 @@ class PokemonTCGTrackerTester:
         # Test comprehensive endpoint coverage
         self.test_comprehensive_endpoint_coverage()
         
+        # Test Edit Deck feature
+        self.test_edit_deck_feature_without_auth()
+        self.test_edit_deck_endpoint_structure()
+        self.test_edit_deck_nonexistent_deck()
+        
         # Print summary
         print("\n" + "=" * 50)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
