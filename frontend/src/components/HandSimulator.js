@@ -97,20 +97,39 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
   };
 
   // Draw opening hand
-  const drawHand = (isMulligan = false) => {
-    const cards = parseDeckList(deckList);
-    const shuffled = shuffle(cards);
-    const drawnHand = shuffled.slice(0, 7);
+  const drawHand = async (isMulligan = false) => {
+    setIsLoading(true);
     
-    const hasBasicPokemon = drawnHand.some(card => card.isBasic);
-    
-    setHand(drawnHand);
-    setHasBasic(hasBasicPokemon);
-    
-    if (isMulligan) {
-      setMulliganCount(prev => prev + 1);
-    } else {
-      setMulliganCount(0);
+    try {
+      const cards = parseDeckList(deckList);
+      const shuffled = shuffle(cards);
+      const drawnHand = shuffled.slice(0, 7);
+      
+      // Fetch card data for each card in hand
+      const handWithData = await Promise.all(
+        drawnHand.map(async (card) => {
+          const cardData = await fetchCardData(card.setCode, card.cardNumber);
+          return {
+            ...card,
+            data: cardData
+          };
+        })
+      );
+      
+      const hasBasicPokemon = handWithData.some(card => card.data?.isBasic);
+      
+      setHand(handWithData);
+      setHasBasic(hasBasicPokemon);
+      
+      if (isMulligan) {
+        setMulliganCount(prev => prev + 1);
+      } else {
+        setMulliganCount(0);
+      }
+    } catch (error) {
+      console.error('Error drawing hand:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
