@@ -573,7 +573,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         totalPokemon: 0,
         totalTrainer: 0,
         totalEnergy: 0,
-        totalCards: 0
+        totalCards: 0,
+        totalBasicPokemon: 0
       });
       setMulliganCount(0);
       
