@@ -1,0 +1,43 @@
+{
+  "total_tests": 7,
+  "passed_tests": 5,
+  "failed_tests": 2,
+  "success_rate": 71.42857142857143,
+  "test_results": [
+    {
+      "test": "Auth Me (Authenticated)",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Get Decks (Authenticated)",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Save Test Results (CRITICAL)",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Verify Test Results Saved",
+      "success": false,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Create Test Matches",
+      "success": true,
+      "details": "Created 3/3 matches"
+    },
+    {
+      "test": "Get Deck Stats with Going Second (CRITICAL)",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Decks List Includes Test Results",
+      "success": false,
+      "details": "Status: 200"
+    }
+  ]
+}
