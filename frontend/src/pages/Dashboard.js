@@ -41,55 +41,54 @@ const Dashboard = ({ user, onLogout }) => {
     const cardDataMap = {};
     const lines = deckListText.split('\n').filter(line => line.trim());
     
-    console.log('=== Starting card data fetch ===');
+    console.log('=== Starting parallel card data fetch ===');
     console.log('Total lines:', lines.length);
     
+    // Parse all unique cards first
+    const uniqueCards = new Map();
+    
     for (const line of lines) {
-      // PTCGL format: "4 Iono PAL 185" or "3 Charizard ex OBF 125"
       const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
       if (match) {
-        const count = match[1];
         const cardName = match[2].trim();
         const setCode = match[3].toUpperCase();
         const cardNumber = match[4];
         const cacheKey = `${setCode}-${cardNumber}`;
         
-        console.log(`Parsing: "${line}"`);
-        console.log(`  → Card: ${cardName}, Set: ${setCode}, Number: ${cardNumber}`);
+        if (!uniqueCards.has(cacheKey)) {
+          uniqueCards.set(cacheKey, { cardName, setCode, cardNumber });
+        }
+      }
+    }
+    
+    console.log(`Found ${uniqueCards.size} unique cards to fetch`);
+    
+    // Fetch all cards in parallel
+    const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { cardName, setCode, cardNumber }]) => {
+      try {
+        // Try lowercase first
+        let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
         
-        // Skip if already fetched
-        if (cardDataMap[cacheKey]) {
-          console.log(`  ✓ Already cached: ${cacheKey}`);
-          continue;
+        let response;
+        try {
+          response = await axios.get(apiUrl, { timeout: 5000 });
+        } catch (firstError) {
+          // If lowercase fails, try uppercase
+          if (firstError.response?.status === 404) {
+            apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
+            response = await axios.get(apiUrl, { timeout: 5000 });
+          } else {
+            throw firstError;
+          }
         }
         
-        try {
-          // Try lowercase first (most common format)
-          let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
-          console.log(`  → Fetching from API: ${apiUrl}`);
-          
-          let response;
-          try {
-            response = await axios.get(apiUrl, { timeout: 10000 });
-          } catch (firstError) {
-            // If lowercase fails, try uppercase
-            if (firstError.response?.status === 404) {
-              console.log(`  → Trying uppercase: ${setCode}-${cardNumber}`);
-              apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
-              response = await axios.get(apiUrl, { timeout: 10000 });
-            } else {
-              throw firstError;
-            }
-          }
-          
-          const card = response.data.data;
-          
-          console.log(`  ✓ Successfully fetched: ${card.name}`);
-          console.log(`    - Supertype: ${card.supertype}`);
-          console.log(`    - Subtypes: ${card.subtypes?.join(', ')}`);
-          console.log(`    - isBasic: ${card.supertype === 'Pokémon' && card.subtypes?.includes('Basic')}`);
-          
-          cardDataMap[cacheKey] = {
+        const card = response.data.data;
+        
+        console.log(`✓ ${card.name} (${cacheKey})`);
+        
+        return {
+          cacheKey,
+          data: {
             name: card.name,
             image: card.images?.small || null,
             supertype: card.supertype,
@@ -106,19 +105,25 @@ const Dashboard = ({ user, onLogout }) => {
             isPokemon: card.supertype === 'Pokémon',
             isTrainer: card.supertype === 'Trainer',
             isEnergy: card.supertype === 'Energy'
-          };
-        } catch (error) {
-          console.error(`  ✗ Error fetching ${setCode}-${cardNumber}:`, error.response?.status, error.message);
-          if (error.response?.status === 404) {
-            console.error(`    Card not found in API. Check if set code and number are correct.`);
           }
-        }
-      } else {
-        console.warn(`Could not parse line: "${line}"`);
+        };
+      } catch (error) {
+        console.error(`✗ Failed: ${cacheKey} - ${error.message}`);
+        return null;
       }
-    }
+    });
     
-    console.log(`=== Fetch complete: ${Object.keys(cardDataMap).length} unique cards cached ===`);
+    // Wait for all fetches to complete
+    const results = await Promise.all(fetchPromises);
+    
+    // Build the card data map
+    results.forEach(result => {
+      if (result) {
+        cardDataMap[result.cacheKey] = result.data;
+      }
+    });
+    
+    console.log(`=== Fetch complete: ${Object.keys(cardDataMap).length}/${uniqueCards.size} cards fetched ===`);
     return cardDataMap;
   };
 
