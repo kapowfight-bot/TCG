@@ -90,6 +90,7 @@ class MatchCreate(BaseModel):
     opponent_deck_name: str
     went_first: bool
     bad_game: bool = False
+    mulligan_count: int = 0
     notes: Optional[str] = None
 
 class MatchUpdate(BaseModel):
