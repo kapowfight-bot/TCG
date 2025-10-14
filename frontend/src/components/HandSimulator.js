@@ -114,6 +114,10 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
         console.log(`Card: ${card.name} (${cacheKey})`);
         console.log('  Data found:', data.error ? 'NO' : 'YES');
         console.log('  Image URL:', data.image);
+        console.log('  isPokemon:', data.isPokemon);
+        console.log('  isTrainer:', data.isTrainer);
+        console.log('  isEnergy:', data.isEnergy);
+        console.log('  Supertype:', data.supertype);
         
         return {
           ...card,
