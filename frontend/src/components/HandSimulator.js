@@ -267,8 +267,19 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
             </div>
           )}
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+                <p className="text-gray-400 text-lg">Loading cards from Pokemon TCG API...</p>
+                <p className="text-gray-500 text-sm mt-2">This may take a few seconds</p>
+              </div>
+            </div>
+          )}
+
           {/* Hand Display */}
-          {hand.length > 0 && (
+          {hand.length > 0 && !isLoading && (
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold">Your Hand (7 cards)</h3>
