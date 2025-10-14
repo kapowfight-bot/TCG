@@ -186,8 +186,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     results.forEach(result => {
       if (result) {
         cardDataMap[result.cacheKey] = result.data;
-        // If card has 'fromExternalAPI' flag, add to batch save
-        if (result.fromExternalAPI) {
+        // If card has 'fromExternalAPI' or 'fromDeckListOnly' flag, add to batch save
+        if (result.fromExternalAPI || result.fromDeckListOnly) {
           cardsToSave[result.cacheKey] = result.data;
         }
       }
