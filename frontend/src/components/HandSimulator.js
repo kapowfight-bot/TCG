@@ -12,6 +12,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
   
   // Test statistics tracking
   const [testStats, setTestStats] = useState({
