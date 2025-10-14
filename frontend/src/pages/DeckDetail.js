@@ -44,6 +44,8 @@ const DeckDetail = ({ user, onLogout }) => {
   const [editDeckName, setEditDeckName] = useState('');
   const [editDeckList, setEditDeckList] = useState('');
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [isTestResultsExpanded, setIsTestResultsExpanded] = useState(true);
+  const [isMatchStatsExpanded, setIsMatchStatsExpanded] = useState(false);
 
   useEffect(() => {
     fetchDeckData();
