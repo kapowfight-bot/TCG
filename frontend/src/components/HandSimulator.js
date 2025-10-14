@@ -322,25 +322,25 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
                 <div className="bg-[#0f0f10] rounded-xl p-4">
                   <div className="text-sm text-gray-400 mb-1">Basic Pokemon</div>
                   <div className="text-2xl font-bold text-emerald-500">
-                    {hand.filter(c => c.isBasic).length}
+                    {hand.filter(c => c.data?.isBasic).length}
                   </div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
-                  <div className="text-sm text-gray-400 mb-1">Evolved</div>
+                  <div className="text-sm text-gray-400 mb-1">Evolved Pokemon</div>
                   <div className="text-2xl font-bold text-purple-400">
-                    {hand.filter(c => !c.isBasic && !c.isTrainer && !c.isEnergy).length}
+                    {hand.filter(c => c.data?.isPokemon && !c.data?.isBasic).length}
                   </div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
                   <div className="text-sm text-gray-400 mb-1">Trainers</div>
                   <div className="text-2xl font-bold text-blue-400">
-                    {hand.filter(c => c.isTrainer).length}
+                    {hand.filter(c => c.data?.isTrainer).length}
                   </div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
                   <div className="text-sm text-gray-400 mb-1">Energy</div>
                   <div className="text-2xl font-bold text-yellow-400">
-                    {hand.filter(c => c.isEnergy).length}
+                    {hand.filter(c => c.data?.isEnergy).length}
                   </div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
