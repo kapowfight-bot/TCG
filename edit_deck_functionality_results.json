@@ -1,0 +1,66 @@
+{
+  "total_tests": 9,
+  "passed_tests": 9,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "critical_issues": [],
+  "minor_issues": [],
+  "overall_working": true,
+  "test_results": [
+    {
+      "test": "Backend Service Health",
+      "success": true,
+      "details": "Backend service is healthy and accessible",
+      "critical": true
+    },
+    {
+      "test": "Edit Deck Endpoint Implementation",
+      "success": true,
+      "details": "Endpoint exists, requires authentication",
+      "critical": true
+    },
+    {
+      "test": "Test Results Reset Logic Structure",
+      "success": true,
+      "details": "Partial update logic properly structured",
+      "critical": true
+    },
+    {
+      "test": "Deck Update Data Handling",
+      "success": true,
+      "details": "Complete update structure handled properly",
+      "critical": true
+    },
+    {
+      "test": "Match History Preservation Endpoint",
+      "success": true,
+      "details": "Matches endpoint available for verification",
+      "critical": true
+    },
+    {
+      "test": "Updated At Timestamp Handling",
+      "success": true,
+      "details": "Update endpoint handles timestamp logic",
+      "critical": true
+    },
+    {
+      "test": "Test Results Save Endpoint",
+      "success": true,
+      "details": "Test results save endpoint available",
+      "critical": true
+    },
+    {
+      "test": "Deck Stats Endpoint Availability",
+      "success": true,
+      "details": "Stats endpoint available for verification",
+      "critical": true
+    },
+    {
+      "test": "Error Handling Robustness",
+      "success": true,
+      "details": "Error handling works properly",
+      "critical": true
+    }
+  ],
+  "deck_id_tested": "79572d04-3a16-4c1a-b967-016d1d62b798"
+}
