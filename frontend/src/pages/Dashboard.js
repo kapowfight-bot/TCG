@@ -41,30 +41,40 @@ const Dashboard = ({ user, onLogout }) => {
     const cardDataMap = {};
     const lines = deckListText.split('\n').filter(line => line.trim());
     
+    console.log('=== Starting card data fetch ===');
+    console.log('Total lines:', lines.length);
+    
     for (const line of lines) {
+      // PTCGL format: "4 Iono PAL 185" or "3 Charizard ex OBF 125"
       const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
       if (match) {
+        const count = match[1];
+        const cardName = match[2].trim();
         const setCode = match[3].toUpperCase();
         const cardNumber = match[4];
         const cacheKey = `${setCode}-${cardNumber}`;
         
+        console.log(`Parsing: "${line}"`);
+        console.log(`  → Card: ${cardName}, Set: ${setCode}, Number: ${cardNumber}`);
+        
         // Skip if already fetched
-        if (cardDataMap[cacheKey]) continue;
+        if (cardDataMap[cacheKey]) {
+          console.log(`  ✓ Already cached: ${cacheKey}`);
+          continue;
+        }
         
         try {
-          const response = await axios.get(
-            `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`,
-            { timeout: 5000 }
-          );
+          const apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+          console.log(`  → Fetching from API: ${apiUrl}`);
+          
+          const response = await axios.get(apiUrl, { timeout: 10000 });
           
           const card = response.data.data;
           
-          // Debug logging
-          console.log(`Fetched ${card.name}:`, {
-            supertype: card.supertype,
-            subtypes: card.subtypes,
-            isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic')
-          });
+          console.log(`  ✓ Successfully fetched: ${card.name}`);
+          console.log(`    - Supertype: ${card.supertype}`);
+          console.log(`    - Subtypes: ${card.subtypes?.join(', ')}`);
+          console.log(`    - isBasic: ${card.supertype === 'Pokémon' && card.subtypes?.includes('Basic')}`);
           
           cardDataMap[cacheKey] = {
             name: card.name,
@@ -85,11 +95,17 @@ const Dashboard = ({ user, onLogout }) => {
             isEnergy: card.supertype === 'Energy'
           };
         } catch (error) {
-          console.error(`Error fetching card ${setCode}-${cardNumber}:`, error.message);
+          console.error(`  ✗ Error fetching ${setCode}-${cardNumber}:`, error.response?.status, error.message);
+          if (error.response?.status === 404) {
+            console.error(`    Card not found in API. Check if set code and number are correct.`);
+          }
         }
+      } else {
+        console.warn(`Could not parse line: "${line}"`);
       }
     }
     
+    console.log(`=== Fetch complete: ${Object.keys(cardDataMap).length} unique cards cached ===`);
     return cardDataMap;
   };
 
