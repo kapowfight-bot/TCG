@@ -537,6 +537,44 @@ async def get_cards_count():
     count = await db.pokemon_cards.count_documents({})
     return {"count": count}
 
+class TestResults(BaseModel):
+    total_hands: int
+    mulligan_count: int
+    mulligan_percentage: float
+    avg_pokemon: float
+    avg_trainer: float
+    avg_energy: float
+
+@api_router.post("/decks/{deck_id}/test-results")
+async def save_test_results(deck_id: str, test_results: TestResults, request: Request):
+    """Save hand simulator test results to deck"""
+    user = await get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # Verify deck belongs to user
+    deck = await db.decks.find_one({"id": deck_id, "user_id": user.id}, {"_id": 0})
+    if not deck:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    
+    # Update deck with test results
+    await db.decks.update_one(
+        {"id": deck_id},
+        {"$set": {
+            "test_results": {
+                "total_hands": test_results.total_hands,
+                "mulligan_count": test_results.mulligan_count,
+                "mulligan_percentage": test_results.mulligan_percentage,
+                "avg_pokemon": test_results.avg_pokemon,
+                "avg_trainer": test_results.avg_trainer,
+                "avg_energy": test_results.avg_energy,
+                "last_tested": datetime.now(timezone.utc).isoformat()
+            }
+        }}
+    )
+    
+    return {"message": "Test results saved successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
