@@ -765,6 +765,11 @@ const DeckDetail = ({ user, onLogout }) => {
                   <div className="text-xs text-gray-500 mt-1">per hand</div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Avg Basic Pokemon</div>
+                  <div className="text-2xl font-bold text-emerald-400">{deck.test_results.avg_basic_pokemon || 0}</div>
+                  <div className="text-xs text-gray-500 mt-1">per hand</div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
                   <div className="text-sm text-gray-400 mb-1">Avg Trainer</div>
                   <div className="text-2xl font-bold text-blue-400">{deck.test_results.avg_trainer}</div>
                   <div className="text-xs text-gray-500 mt-1">per hand</div>
