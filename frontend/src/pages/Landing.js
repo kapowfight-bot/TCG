@@ -41,8 +41,9 @@ const Landing = ({ onAuth }) => {
   };
 
   const handleLogin = () => {
+    const authUrl = process.env.REACT_APP_AUTH_URL || 'https://auth.emergentagent.com';
     const redirectUrl = `${window.location.origin}/dashboard`;
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    window.location.href = `${authUrl}/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   if (isProcessing) {
