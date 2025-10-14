@@ -571,7 +571,10 @@ const DeckDetail = ({ user, onLogout }) => {
           cardData={deck.card_data || {}}
           deckId={deck.id}
           isOpen={isSimulatorOpen}
-          onClose={() => setIsSimulatorOpen(false)}
+          onClose={() => {
+            setIsSimulatorOpen(false);
+            fetchDeckData(); // Refresh deck data to show updated test results
+          }}
         />
       )}
     </div>
