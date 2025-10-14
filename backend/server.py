@@ -651,17 +651,23 @@ class TestResults(BaseModel):
 @api_router.post("/decks/{deck_id}/test-results")
 async def save_test_results(deck_id: str, test_results: TestResults, request: Request):
     """Save hand simulator test results to deck (accumulative)"""
-    user = await get_current_user(request)
-    if not user:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    # Verify deck belongs to user
-    deck = await db.decks.find_one({"id": deck_id, "user_id": user.id}, {"_id": 0})
-    if not deck:
-        raise HTTPException(status_code=404, detail="Deck not found")
-    
-    # Get existing test results (if any)
-    existing_results = deck.get("test_results", {})
+    try:
+        user = await get_current_user(request)
+        if not user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        # Verify deck belongs to user
+        deck = await db.decks.find_one({"id": deck_id, "user_id": user.id}, {"_id": 0})
+        if not deck:
+            raise HTTPException(status_code=404, detail="Deck not found")
+        
+        # Get existing test results (if any)
+        existing_results = deck.get("test_results", {})
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in save_test_results (initial): {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error loading deck: {str(e)}")
     
     # Calculate accumulated totals
     old_total_hands = existing_results.get("total_hands", 0)
