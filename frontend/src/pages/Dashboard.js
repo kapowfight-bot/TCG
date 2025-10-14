@@ -37,6 +37,46 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+  const fetchCardDataForDeck = async (deckListText) => {
+    const cardDataMap = {};
+    const lines = deckListText.split('\n').filter(line => line.trim());
+    
+    for (const line of lines) {
+      const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+      if (match) {
+        const setCode = match[3].toUpperCase();
+        const cardNumber = match[4];
+        const cacheKey = `${setCode}-${cardNumber}`;
+        
+        // Skip if already fetched
+        if (cardDataMap[cacheKey]) continue;
+        
+        try {
+          const response = await axios.get(
+            `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`,
+            { timeout: 5000 }
+          );
+          
+          const card = response.data.data;
+          cardDataMap[cacheKey] = {
+            name: card.name,
+            image: card.images.small,
+            supertype: card.supertype,
+            subtypes: card.subtypes || [],
+            isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+            isPokemon: card.supertype === 'Pokémon',
+            isTrainer: card.supertype === 'Trainer',
+            isEnergy: card.supertype === 'Energy'
+          };
+        } catch (error) {
+          console.error(`Error fetching card ${setCode}-${cardNumber}:`, error.message);
+        }
+      }
+    }
+    
+    return cardDataMap;
+  };
+
   const handleImportDeck = async () => {
     if (!deckName.trim() || !deckList.trim()) {
       toast.error('Please enter both deck name and deck list');
@@ -45,11 +85,16 @@ const Dashboard = ({ user, onLogout }) => {
 
     setIsSubmitting(true);
     try {
+      // Fetch card data before saving
+      toast.info('Fetching card data from Pokemon TCG API...');
+      const cardData = await fetchCardDataForDeck(deckList);
+      
       await axios.post(
         `${API}/decks`,
         {
           deck_name: deckName,
           deck_list: deckList,
+          card_data: cardData,
         },
         { withCredentials: true }
       );
