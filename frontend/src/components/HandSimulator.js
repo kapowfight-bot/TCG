@@ -258,18 +258,64 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
       return;
     }
 
+    if (testStats.totalHandsDrawn === 0) {
+      alert('No hands drawn yet. Draw some hands before saving!');
+      return;
+    }
+
     setIsSaving(true);
     try {
-      // Save the mulligan count to deck notes or as a stat
-      console.log(`Saving mulligan test: ${mulliganCount} mulligans for deck ${deckId}`);
+      // Calculate test metrics
+      const mulliganPercentage = testStats.totalHandsDrawn > 0 
+        ? ((mulliganCount / testStats.totalHandsDrawn) * 100).toFixed(1)
+        : 0;
       
-      // You can extend this to save to backend if needed
-      alert(`Mulligan test saved!\nTotal mulligans: ${mulliganCount}\nThis data can be used when logging matches.`);
+      const avgPokemon = (testStats.totalPokemon / testStats.totalHandsDrawn).toFixed(1);
+      const avgTrainer = (testStats.totalTrainer / testStats.totalHandsDrawn).toFixed(1);
+      const avgEnergy = (testStats.totalEnergy / testStats.totalHandsDrawn).toFixed(1);
+      
+      console.log('Saving test results:', {
+        deckId,
+        totalHandsDrawn: testStats.totalHandsDrawn,
+        mulliganCount,
+        mulliganPercentage,
+        avgPokemon,
+        avgTrainer,
+        avgEnergy
+      });
+      
+      // Save to backend
+      await axios.post(
+        `${API}/decks/${deckId}/test-results`,
+        {
+          total_hands: testStats.totalHandsDrawn,
+          mulligan_count: mulliganCount,
+          mulligan_percentage: parseFloat(mulliganPercentage),
+          avg_pokemon: parseFloat(avgPokemon),
+          avg_trainer: parseFloat(avgTrainer),
+          avg_energy: parseFloat(avgEnergy)
+        },
+        { withCredentials: true }
+      );
+      
+      toast.success(
+        `Test saved!\n${testStats.totalHandsDrawn} hands • ${mulliganPercentage}% mulligan\nAvg: ${avgPokemon} Pokemon, ${avgTrainer} Trainer, ${avgEnergy} Energy`
+      );
+      
+      // Reset test stats
+      setTestStats({
+        totalHandsDrawn: 0,
+        totalPokemon: 0,
+        totalTrainer: 0,
+        totalEnergy: 0,
+        totalCards: 0
+      });
+      setMulliganCount(0);
       
       onClose();
     } catch (error) {
       console.error('Error saving:', error);
-      alert('Failed to save mulligan test');
+      toast.error('Failed to save test results');
     } finally {
       setIsSaving(false);
     }
