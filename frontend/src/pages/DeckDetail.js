@@ -831,6 +831,7 @@ const DeckDetail = ({ user, onLogout }) => {
             setIsSimulatorOpen(false);
             fetchDeckData(); // Refresh deck data to show updated test results
           }}
+          onDeckUpdate={fetchDeckData}
         />
       )}
     </div>
