@@ -350,6 +350,84 @@ const DeckDetail = ({ user, onLogout }) => {
               </p>
             </div>
             <div className="flex space-x-2">
+              <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+                setIsEditDialogOpen(open);
+                if (open) {
+                  setEditDeckName(deck.deck_name);
+                  setEditDeckList(deck.deck_list);
+                }
+              }}>
+                <DialogTrigger asChild>
+                  <Button
+                    data-testid="edit-deck-btn"
+                    variant="outline"
+                    className="border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl px-6"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    Edit Deck
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-[#1a1a1b] border-gray-800 text-white sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">Edit Deck</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-xl p-3">
+                      <p className="text-sm text-yellow-200">
+                        ⚠️ Note: Editing the deck will reset hand test statistics. Match history will remain unchanged.
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-deck-name" className="text-gray-300 mb-2 block">
+                        Deck Name
+                      </Label>
+                      <Input
+                        id="edit-deck-name"
+                        data-testid="edit-deck-name-input"
+                        placeholder="e.g., Charizard ex"
+                        value={editDeckName}
+                        onChange={(e) => setEditDeckName(e.target.value)}
+                        className="bg-[#0f0f10] border-gray-700 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-deck-list" className="text-gray-300 mb-2 block">
+                        Deck List (PTCGL Format)
+                      </Label>
+                      <Textarea
+                        id="edit-deck-list"
+                        data-testid="edit-deck-list-textarea"
+                        placeholder="Paste your PTCGL deck list here..."
+                        value={editDeckList}
+                        onChange={(e) => setEditDeckList(e.target.value)}
+                        className="bg-[#0f0f10] border-gray-700 text-white min-h-[200px] font-mono text-sm"
+                      />
+                    </div>
+                    <Button
+                      data-testid="submit-edit-btn"
+                      onClick={handleEditDeck}
+                      disabled={isEditSubmitting}
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
+                    >
+                      {isEditSubmitting ? 'Updating...' : 'Update Deck'}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Button
                 data-testid="test-hand-btn"
                 onClick={() => setIsSimulatorOpen(true)}
