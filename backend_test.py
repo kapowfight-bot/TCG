@@ -231,6 +231,74 @@ class PokemonTCGTrackerTester:
             self.log_test("Card Lookup Endpoint", False, str(e))
             return False
 
+    def test_test_results_data_validation(self):
+        """Test test results endpoint data validation"""
+        try:
+            # Test with invalid data types
+            invalid_data = {
+                "total_hands": "not_a_number",
+                "mulligan_count": 15,
+                "mulligan_percentage": 15.0,
+                "avg_pokemon": 2.5,
+                "avg_trainer": 3.2,
+                "avg_energy": 1.3
+            }
+            response = requests.post(
+                f"{self.api_url}/decks/test-deck-id/test-results",
+                json=invalid_data,
+                timeout=10
+            )
+            # Should fail due to validation error (422) or auth (401)
+            success = response.status_code in [401, 422]
+            self.log_test("Test Results Data Validation", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Test Results Data Validation", False, str(e))
+            return False
+
+    def test_stats_endpoint_structure(self):
+        """Test that stats endpoint exists and requires auth"""
+        try:
+            response = requests.get(f"{self.api_url}/decks/test-deck-id/stats", timeout=10)
+            success = response.status_code == 401  # Should require authentication
+            self.log_test("Stats Endpoint Structure", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Stats Endpoint Structure", False, str(e))
+            return False
+
+    def test_comprehensive_endpoint_coverage(self):
+        """Test that all expected endpoints exist"""
+        endpoints_to_test = [
+            ("/auth/me", "GET"),
+            ("/auth/session", "POST"),
+            ("/auth/logout", "POST"),
+            ("/decks", "GET"),
+            ("/decks", "POST"),
+            ("/matches", "POST"),
+            ("/cards/count", "GET")
+        ]
+        
+        all_passed = True
+        for endpoint, method in endpoints_to_test:
+            try:
+                if method == "GET":
+                    response = requests.get(f"{self.api_url}{endpoint}", timeout=10)
+                else:
+                    response = requests.post(f"{self.api_url}{endpoint}", json={}, timeout=10)
+                
+                # Any response other than 404 means the endpoint exists
+                if response.status_code == 404:
+                    self.log_test(f"Endpoint Exists: {method} {endpoint}", False, "404 Not Found")
+                    all_passed = False
+                else:
+                    self.log_test(f"Endpoint Exists: {method} {endpoint}", True, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"Endpoint Exists: {method} {endpoint}", False, str(e))
+                all_passed = False
+        
+        return all_passed
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Pokemon TCG Tracker Backend Tests")
