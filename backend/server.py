@@ -370,6 +370,7 @@ async def create_match(match_data: MatchCreate, request: Request):
         opponent_deck_name=match_data.opponent_deck_name,
         went_first=match_data.went_first,
         bad_game=match_data.bad_game,
+        mulligan_count=match_data.mulligan_count,
         notes=match_data.notes
     )
     
