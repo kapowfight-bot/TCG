@@ -341,9 +341,16 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
                     <div
                       key={card.id}
                       data-testid={`hand-card-${index}`}
-                      onClick={() => isPokemon && toggleBasicSelection(card.id)}
+                      onClick={(e) => {
+                        console.log(`Card clicked:`, card.name, { isPokemon, isTrainer, isEnergy });
+                        if (isPokemon) {
+                          toggleBasicSelection(card.id, card.name);
+                        } else {
+                          console.log(`  Not a Pokemon, ignoring click`);
+                        }
+                      }}
                       className={`relative rounded-xl border-4 ${getBorderColor()} transition-all hover:scale-105 shadow-lg overflow-hidden bg-[#0a0a0b] ${
-                        isPokemon ? 'cursor-pointer' : ''
+                        isPokemon ? 'cursor-pointer hover:border-emerald-400' : 'cursor-default'
                       }`}
                     >
                       {/* Selected Indicator */}
