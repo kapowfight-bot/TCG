@@ -159,6 +159,78 @@ class PokemonTCGTrackerTester:
             self.log_test("Non-existent Endpoint", False, str(e))
             return False
 
+    def test_save_test_results_without_auth(self):
+        """Test saving test results without authentication"""
+        try:
+            test_data = {
+                "total_hands": 100,
+                "mulligan_count": 15,
+                "mulligan_percentage": 15.0,
+                "avg_pokemon": 2.5,
+                "avg_trainer": 3.2,
+                "avg_energy": 1.3
+            }
+            response = requests.post(
+                f"{self.api_url}/decks/test-deck-id/test-results",
+                json=test_data,
+                timeout=10
+            )
+            success = response.status_code == 401
+            self.log_test("Save Test Results (Unauthenticated)", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Save Test Results (Unauthenticated)", False, str(e))
+            return False
+
+    def test_test_results_endpoint_structure(self):
+        """Test test results endpoint accepts correct data structure"""
+        try:
+            # Test with missing required fields
+            incomplete_data = {
+                "total_hands": 100,
+                "mulligan_count": 15
+                # Missing other required fields
+            }
+            response = requests.post(
+                f"{self.api_url}/decks/test-deck-id/test-results",
+                json=incomplete_data,
+                timeout=10
+            )
+            # Should fail due to missing auth, but we're testing if endpoint exists and validates structure
+            success = response.status_code in [401, 422]  # 401 for auth, 422 for validation
+            self.log_test("Test Results Endpoint Structure", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Test Results Endpoint Structure", False, str(e))
+            return False
+
+    def test_cards_endpoint(self):
+        """Test cards endpoint functionality"""
+        try:
+            response = requests.get(f"{self.api_url}/cards/count", timeout=10)
+            success = response.status_code == 200
+            if success:
+                data = response.json()
+                success = "count" in data and isinstance(data["count"], int)
+            self.log_test("Cards Count Endpoint", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Cards Count Endpoint", False, str(e))
+            return False
+
+    def test_card_lookup_endpoint(self):
+        """Test individual card lookup endpoint"""
+        try:
+            # Test with a common set code and card number
+            response = requests.get(f"{self.api_url}/cards/MEW/123", timeout=10)
+            # Should return 404 if card not found, which is expected behavior
+            success = response.status_code in [200, 404]
+            self.log_test("Card Lookup Endpoint", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Card Lookup Endpoint", False, str(e))
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Pokemon TCG Tracker Backend Tests")
