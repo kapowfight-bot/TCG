@@ -140,6 +140,7 @@ const Dashboard = ({ user, onLogout }) => {
           
           return {
             cacheKey,
+            fromExternalAPI: true,  // Mark for database saving
             data: {
               name: card.name,
               image: card.images?.small || null,
@@ -171,14 +172,38 @@ const Dashboard = ({ user, onLogout }) => {
     // Wait for all fetches to complete
     const results = await Promise.all(fetchPromises);
     
+    // Track which cards came from external API (need to be saved to DB)
+    const cardsToSave = {};
+    
     // Build the card data map
     results.forEach(result => {
       if (result) {
         cardDataMap[result.cacheKey] = result.data;
+        // If card has 'fromExternalAPI' flag, add to batch save
+        if (result.fromExternalAPI) {
+          cardsToSave[result.cacheKey] = result.data;
+        }
       }
     });
     
     console.log(`=== Fetch complete: ${Object.keys(cardDataMap).length}/${uniqueCards.size} cards fetched ===`);
+    
+    // Save newly fetched cards to local database for future use
+    if (Object.keys(cardsToSave).length > 0) {
+      try {
+        console.log(`Saving ${Object.keys(cardsToSave).length} new cards to local database...`);
+        await axios.post(
+          `${API}/cards/batch`,
+          cardsToSave,
+          { withCredentials: true, timeout: 10000 }
+        );
+        console.log('✓ Cards saved to local database for future use');
+      } catch (saveError) {
+        console.error('Failed to save cards to database:', saveError);
+        // Don't fail the whole operation if saving fails
+      }
+    }
+    
     return cardDataMap;
   };
 
