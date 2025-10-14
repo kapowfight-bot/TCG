@@ -451,12 +451,23 @@ const DeckDetail = ({ user, onLogout }) => {
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-sm text-gray-400 mb-1">Going First</div>
-            <div className="text-xl font-bold">
+            <div className="text-xl font-bold text-blue-400">
               {stats.went_first_wins}W - {stats.went_first_losses}L
             </div>
             <div className="text-sm text-gray-500 mt-1">
               {stats.went_first_wins + stats.went_first_losses > 0
                 ? Math.round((stats.went_first_wins / (stats.went_first_wins + stats.went_first_losses)) * 100)
+                : 0}% WR
+            </div>
+          </div>
+          <div className="glass rounded-2xl p-6">
+            <div className="text-sm text-gray-400 mb-1">Going Second</div>
+            <div className="text-xl font-bold text-purple-400">
+              {stats.went_second_wins}W - {stats.went_second_losses}L
+            </div>
+            <div className="text-sm text-gray-500 mt-1">
+              {stats.went_second_wins + stats.went_second_losses > 0
+                ? Math.round((stats.went_second_wins / (stats.went_second_wins + stats.went_second_losses)) * 100)
                 : 0}% WR
             </div>
           </div>
