@@ -64,10 +64,23 @@ const Dashboard = ({ user, onLogout }) => {
         }
         
         try {
-          const apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+          // Try lowercase first (most common format)
+          let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
           console.log(`  → Fetching from API: ${apiUrl}`);
           
-          const response = await axios.get(apiUrl, { timeout: 10000 });
+          let response;
+          try {
+            response = await axios.get(apiUrl, { timeout: 10000 });
+          } catch (firstError) {
+            // If lowercase fails, try uppercase
+            if (firstError.response?.status === 404) {
+              console.log(`  → Trying uppercase: ${setCode}-${cardNumber}`);
+              apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
+              response = await axios.get(apiUrl, { timeout: 10000 });
+            } else {
+              throw firstError;
+            }
+          }
           
           const card = response.data.data;
           
