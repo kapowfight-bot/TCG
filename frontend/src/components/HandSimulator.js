@@ -3,12 +3,11 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import axios from 'axios';
 
-const HandSimulator = ({ deckList, isOpen, onClose }) => {
+const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
   const [hand, setHand] = useState([]);
   const [mulliganCount, setMulliganCount] = useState(0);
   const [hasBasic, setHasBasic] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [cardCache, setCardCache] = useState({});
 
   // Fetch card data from Pokemon TCG API
   const fetchCardData = async (setCode, cardNumber, cardName) => {
