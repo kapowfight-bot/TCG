@@ -411,16 +411,42 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
             )}
           </div>
 
-          {/* Mulligan Counter */}
-          {mulliganCount > 0 && (
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-orange-400 font-semibold">
-                  Mulligans: {mulliganCount}
-                </span>
-                <span className="text-sm text-gray-400">
-                  Opponent draws {mulliganCount} card{mulliganCount !== 1 ? 's' : ''}
-                </span>
+          {/* Test Statistics */}
+          {testStats.totalHandsDrawn > 0 && (
+            <div className="bg-[#0f0f10] border border-gray-700 rounded-xl p-4">
+              <h3 className="font-semibold mb-3">Current Test Statistics</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                  <div className="text-sm text-gray-400">Hands Drawn</div>
+                  <div className="text-2xl font-bold text-white">{testStats.totalHandsDrawn}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Mulligans</div>
+                  <div className="text-2xl font-bold text-orange-400">{mulliganCount}</div>
+                  <div className="text-xs text-gray-500">
+                    {testStats.totalHandsDrawn > 0 
+                      ? ((mulliganCount / testStats.totalHandsDrawn) * 100).toFixed(1)
+                      : 0}%
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Avg Pokemon</div>
+                  <div className="text-2xl font-bold text-green-400">
+                    {(testStats.totalPokemon / testStats.totalHandsDrawn).toFixed(1)}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Avg Trainer</div>
+                  <div className="text-2xl font-bold text-blue-400">
+                    {(testStats.totalTrainer / testStats.totalHandsDrawn).toFixed(1)}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Avg Energy</div>
+                  <div className="text-2xl font-bold text-yellow-400">
+                    {(testStats.totalEnergy / testStats.totalHandsDrawn).toFixed(1)}
+                  </div>
+                </div>
               </div>
             </div>
           )}
