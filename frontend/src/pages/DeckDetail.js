@@ -437,7 +437,7 @@ const DeckDetail = ({ user, onLogout }) => {
         )}
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
           <div className="glass rounded-2xl p-6">
             <div className="text-sm text-gray-400 mb-1">Total Matches</div>
             <div className="text-3xl font-bold">{stats.total_matches}</div>
