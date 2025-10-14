@@ -53,7 +53,17 @@ const Landing = ({ onAuth }) => {
       <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-gray-400 text-lg">Authenticating...</p>
+          <p className="text-gray-400 text-lg mb-4">Authenticating...</p>
+          <Button
+            onClick={() => {
+              setIsProcessing(false);
+              window.location.hash = '';
+            }}
+            variant="ghost"
+            className="text-gray-500 hover:text-white"
+          >
+            Cancel
+          </Button>
         </div>
       </div>
     );
