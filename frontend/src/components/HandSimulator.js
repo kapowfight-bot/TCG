@@ -594,10 +594,17 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
               {(!cardData || Object.keys(cardData).length === 0) && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4">
                   <h4 className="font-bold text-red-400 mb-2">⚠️ Card Data Not Available</h4>
-                  <p className="text-sm text-gray-300">
+                  <p className="text-sm text-gray-300 mb-3">
                     This deck was imported before the card database was set up. 
-                    Please delete and re-import this deck to fetch card images and data.
+                    Click the button below to fetch card data without losing your match history.
                   </p>
+                  <Button
+                    onClick={handleRefreshCardData}
+                    disabled={isRefreshing}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    {isRefreshing ? 'Fetching Card Data...' : 'Refresh Card Data'}
+                  </Button>
                 </div>
               )}
               
