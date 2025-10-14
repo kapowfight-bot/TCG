@@ -39,16 +39,34 @@ const Dashboard = ({ user, onLogout }) => {
 
   const fetchCardDataForDeck = async (deckListText) => {
     const cardDataMap = {};
-    const lines = deckListText.split('\n').filter(line => line.trim());
+    const lines = deckListText.split('\n');
     
     console.log('=== Starting card fetch from local database ===');
     console.log('Total lines:', lines.length);
     
-    // Parse all unique cards first
+    // Parse all unique cards first, tracking their sections
     const uniqueCards = new Map();
+    let currentSection = 'unknown';
     
     for (const line of lines) {
-      const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+      
+      // Check for section headers
+      if (trimmedLine.match(/^Pokémon:/i) || trimmedLine.match(/^Pokemon:/i)) {
+        currentSection = 'pokemon';
+        continue;
+      }
+      if (trimmedLine.match(/^Trainer:/i)) {
+        currentSection = 'trainer';
+        continue;
+      }
+      if (trimmedLine.match(/^Energy:/i)) {
+        currentSection = 'energy';
+        continue;
+      }
+      
+      const match = trimmedLine.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
       if (match) {
         const cardName = match[2].trim();
         const setCode = match[3].toUpperCase();
@@ -56,7 +74,7 @@ const Dashboard = ({ user, onLogout }) => {
         const cacheKey = `${setCode}-${cardNumber}`;
         
         if (!uniqueCards.has(cacheKey)) {
-          uniqueCards.set(cacheKey, { cardName, setCode, cardNumber });
+          uniqueCards.set(cacheKey, { cardName, setCode, cardNumber, section: currentSection });
         }
       }
     }
