@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class PokemonTCGTrackerTester:
-    def __init__(self, base_url="https://tcg-deck-master.preview.emergentagent.com"):
+    def __init__(self, base_url="https://deck-test-stats.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session_token = None
