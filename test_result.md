@@ -185,8 +185,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Save test results endpoint"
-    - "Calculate going second stats in stats endpoint"
+    - "Display test results on Dashboard"
+    - "Display test results on DeckDetail page"
+    - "Display going second stats on DeckDetail page"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -194,3 +195,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Initialized test_result.md with current implementation state. Backend endpoints need testing first before frontend verification."
+  - agent: "testing"
+    message: "✅ BACKEND TESTING COMPLETE: Both critical backend tasks are now working correctly. Fixed Deck model to include test_results field. All test statistics endpoints are functional and tested with real data. Ready for frontend testing or main agent can summarize and finish if no frontend testing needed."
