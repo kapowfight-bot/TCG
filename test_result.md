@@ -101,3 +101,90 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Testing the recently implemented test statistics and "going second" win/loss statistics:
+  1. Verify test results can be saved to decks via API endpoint
+  2. Verify test results are displayed on Dashboard deck cards
+  3. Verify test results are displayed on DeckDetail page
+  4. Verify going second stats are calculated and displayed correctly
+
+backend:
+  - task: "Save test results endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint POST /api/decks/{deck_id}/test-results implemented. Needs testing to verify it saves test results correctly."
+  
+  - task: "Calculate going second stats in stats endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Stats endpoint GET /api/decks/{deck_id}/stats already calculates went_second_wins and went_second_losses. Needs testing to verify correctness."
+
+frontend:
+  - task: "Display test results on Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Dashboard.js lines 438-456 show test results preview if deck.test_results exists. Will verify after backend testing."
+  
+  - task: "Display test results on DeckDetail page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DeckDetail.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DeckDetail.js lines 399-437 display full test results with 6 metrics. Will verify after backend testing."
+  
+  - task: "Display going second stats on DeckDetail page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DeckDetail.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DeckDetail.js lines 463-473 display going second W-L record and win rate. Will verify after backend testing."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Save test results endpoint"
+    - "Calculate going second stats in stats endpoint"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Initialized test_result.md with current implementation state. Backend endpoints need testing first before frontend verification."
