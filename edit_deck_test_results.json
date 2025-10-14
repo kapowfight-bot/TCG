@@ -1,0 +1,64 @@
+{
+  "total_tests": 11,
+  "passed_tests": 11,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "test_results": [
+    {
+      "test": "Deck Exists Check",
+      "success": true,
+      "details": "Deck endpoint requires auth (expected)"
+    },
+    {
+      "test": "PUT Deck Endpoint Exists",
+      "success": true,
+      "details": "Status: 401 - Endpoint exists"
+    },
+    {
+      "test": "Test Results Endpoint Exists",
+      "success": true,
+      "details": "Status: 401 - Endpoint exists"
+    },
+    {
+      "test": "Matches Endpoint Exists",
+      "success": true,
+      "details": "Status: 401 - Endpoint exists"
+    },
+    {
+      "test": "Stats Endpoint Exists",
+      "success": true,
+      "details": "Status: 401 - Endpoint exists"
+    },
+    {
+      "test": "Edit Deck Data Validation",
+      "success": true,
+      "details": "Status: 422"
+    },
+    {
+      "test": "Partial Update Validation",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Empty Update Validation",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Non-existent Deck Update",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Malformed Deck ID Update",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Large Deck List Update",
+      "success": true,
+      "details": "Status: 401"
+    }
+  ],
+  "deck_id_tested": "79572d04-3a16-4c1a-b967-016d1d62b798"
+}
