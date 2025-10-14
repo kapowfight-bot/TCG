@@ -505,6 +505,11 @@ const DeckDetail = ({ user, onLogout }) => {
                         </span>
                       </div>
                       <div className="text-white font-semibold mb-1">vs {match.opponent_deck_name}</div>
+                      {match.mulligan_count > 0 && (
+                        <div className="text-sm text-orange-400 mt-1">
+                          {match.mulligan_count} mulligan{match.mulligan_count !== 1 ? 's' : ''}
+                        </div>
+                      )}
                       {match.notes && <div className="text-sm text-gray-400 mt-2">{match.notes}</div>}
                     </div>
                     <div className="text-sm text-gray-500">
