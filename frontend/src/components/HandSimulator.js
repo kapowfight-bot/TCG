@@ -321,6 +321,17 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
           {/* Hand Display */}
           {hand.length > 0 && !isLoading && (
             <div>
+              {/* Warning if no card data */}
+              {(!cardData || Object.keys(cardData).length === 0) && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4">
+                  <h4 className="font-bold text-red-400 mb-2">⚠️ Card Data Not Available</h4>
+                  <p className="text-sm text-gray-300">
+                    This deck was imported before the card database was set up. 
+                    Please delete and re-import this deck to fetch card images and data.
+                  </p>
+                </div>
+              )}
+              
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold">Your Hand (7 cards)</h3>
                 <div className="flex items-center gap-3">
