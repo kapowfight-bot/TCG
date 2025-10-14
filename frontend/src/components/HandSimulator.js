@@ -228,31 +228,40 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
           <div className="flex flex-wrap gap-3">
             <Button
               data-testid="draw-hand-btn"
-              onClick={() => drawHand(false)}
+              onClick={drawHand}
               disabled={isLoading}
               className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
             >
-              {isLoading ? 'Loading Cards...' : 'Draw Opening Hand'}
+              {isLoading ? 'Loading...' : 'Draw Opening Hand'}
             </Button>
             
-            {hand.length > 0 && !hasBasic && !isLoading && (
-              <Button
-                data-testid="mulligan-btn"
-                onClick={() => drawHand(true)}
-                className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl"
-              >
-                Mulligan
-              </Button>
-            )}
-            
             {hand.length > 0 && !isLoading && (
-              <Button
-                onClick={reset}
-                variant="outline"
-                className="border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
-              >
-                Reset
-              </Button>
+              <>
+                <Button
+                  data-testid="mulligan-btn"
+                  onClick={handleMulligan}
+                  className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl"
+                >
+                  Mulligan (No Basic)
+                </Button>
+                
+                <Button
+                  data-testid="save-btn"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                >
+                  {isSaving ? 'Saving...' : 'Save Test'}
+                </Button>
+                
+                <Button
+                  onClick={reset}
+                  variant="outline"
+                  className="border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
+                >
+                  Reset
+                </Button>
+              </>
             )}
           </div>
 
