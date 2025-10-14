@@ -80,6 +80,7 @@ class SessionResponse(BaseModel):
 class DeckCreate(BaseModel):
     deck_name: str
     deck_list: str
+    card_data: Optional[dict] = None
 
 class DeckUpdate(BaseModel):
     deck_name: Optional[str] = None
