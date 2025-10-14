@@ -294,28 +294,30 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold">Your Hand (7 cards)</h3>
-                <div className={`px-4 py-2 rounded-xl font-semibold ${
-                  hasBasic 
-                    ? 'bg-emerald-500/20 text-emerald-400' 
-                    : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {hasBasic ? '✓ Has Basic Pokemon' : '✗ No Basic Pokemon'}
+                <div className="flex items-center gap-3">
+                  <div className={`px-4 py-2 rounded-xl font-semibold ${
+                    selectedBasics.size > 0
+                      ? 'bg-emerald-500/20 text-emerald-400' 
+                      : 'bg-orange-500/20 text-orange-400'
+                  }`}>
+                    {selectedBasics.size > 0 
+                      ? `✓ ${selectedBasics.size} Basic Pokemon Selected` 
+                      : '⚠ Click Basic Pokemon'}
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
                 {hand.map((card, index) => {
                   const cardData = card.data;
-                  const isBasic = cardData?.isBasic;
                   const isPokemon = cardData?.isPokemon;
                   const isTrainer = cardData?.isTrainer;
                   const isEnergy = cardData?.isEnergy;
-                  const isEvolved = isPokemon && !isBasic;
+                  const isSelected = selectedBasics.has(card.id);
                   
                   // Get border color based on type
                   const getBorderColor = () => {
-                    if (isBasic) return 'border-emerald-500 shadow-emerald-500/50';
-                    if (isEvolved) return 'border-purple-500 shadow-purple-500/50';
+                    if (isPokemon) return isSelected ? 'border-emerald-500 shadow-emerald-500/50' : 'border-green-500 shadow-green-500/50';
                     if (isTrainer) return 'border-blue-500 shadow-blue-500/50';
                     if (isEnergy) return 'border-yellow-500 shadow-yellow-500/50';
                     return 'border-gray-600 shadow-gray-600/50';
@@ -323,17 +325,10 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
                   
                   // Get type label
                   const getTypeLabel = () => {
-                    if (isBasic) return { text: 'BASIC', color: 'bg-emerald-500' };
-                    if (isEvolved) return { 
-                      text: cardData.subtypes?.filter(s => s !== 'Pokémon').join(' ') || 'EVOLVED',
-                      color: 'bg-purple-500'
-                    };
-                    if (isTrainer) return { 
-                      text: cardData.subtypes?.[0] || 'TRAINER',
-                      color: 'bg-blue-500'
-                    };
+                    if (isPokemon) return { text: 'POKEMON', color: isSelected ? 'bg-emerald-500' : 'bg-green-500' };
+                    if (isTrainer) return { text: 'TRAINER', color: 'bg-blue-500' };
                     if (isEnergy) return { text: 'ENERGY', color: 'bg-yellow-500' };
-                    return { text: 'LOADING', color: 'bg-gray-600' };
+                    return { text: 'CARD', color: 'bg-gray-600' };
                   };
                   
                   const typeLabel = getTypeLabel();
@@ -342,8 +337,33 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
                     <div
                       key={card.id}
                       data-testid={`hand-card-${index}`}
-                      className={`relative rounded-xl border-4 ${getBorderColor()} transition-all hover:scale-105 shadow-lg overflow-hidden bg-[#0a0a0b]`}
+                      onClick={() => isPokemon && toggleBasicSelection(card.id)}
+                      className={`relative rounded-xl border-4 ${getBorderColor()} transition-all hover:scale-105 shadow-lg overflow-hidden bg-[#0a0a0b] ${
+                        isPokemon ? 'cursor-pointer' : ''
+                      }`}
                     >
+                      {/* Selected Indicator */}
+                      {isSelected && (
+                        <div className="absolute inset-0 bg-emerald-500/20 pointer-events-none z-10 flex items-center justify-center">
+                          <div className="bg-emerald-500 text-white rounded-full p-3 shadow-lg">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                      
                       {/* Card Image */}
                       {cardData?.image ? (
                         <img 
