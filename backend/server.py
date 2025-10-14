@@ -264,7 +264,8 @@ async def create_deck(deck_data: DeckCreate, request: Request):
     new_deck = Deck(
         user_id=user.id,
         deck_name=deck_data.deck_name,
-        deck_list=deck_data.deck_list
+        deck_list=deck_data.deck_list,
+        card_data=deck_data.card_data
     )
     
     deck_doc = new_deck.model_dump()
