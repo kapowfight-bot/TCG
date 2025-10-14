@@ -256,6 +256,14 @@ class PokemonTCGTrackerTester:
         # Error handling tests
         self.test_nonexistent_endpoints()
         
+        # Test new features (test statistics)
+        self.test_save_test_results_without_auth()
+        self.test_test_results_endpoint_structure()
+        
+        # Test additional endpoints
+        self.test_cards_endpoint()
+        self.test_card_lookup_endpoint()
+        
         # Print summary
         print("\n" + "=" * 50)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
