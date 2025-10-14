@@ -244,7 +244,7 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {hand.map((card, index) => {
                   const cardData = card.data;
                   const isBasic = cardData?.isBasic;
@@ -253,68 +253,170 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
                   const isEnergy = cardData?.isEnergy;
                   const isEvolved = isPokemon && !isBasic;
                   
+                  // Get background color based on type
+                  const getBgColor = () => {
+                    if (isBasic) return 'from-emerald-500/20 to-emerald-600/20 border-emerald-500';
+                    if (isEvolved) return 'from-purple-500/20 to-purple-600/20 border-purple-500';
+                    if (isTrainer) return 'from-blue-500/20 to-blue-600/20 border-blue-500';
+                    if (isEnergy) return 'from-yellow-500/20 to-yellow-600/20 border-yellow-500';
+                    return 'from-gray-500/20 to-gray-600/20 border-gray-700';
+                  };
+                  
                   return (
                     <div
                       key={card.id}
                       data-testid={`hand-card-${index}`}
-                      className={`relative rounded-xl overflow-hidden border-4 transition-all hover:scale-105 ${
-                        isBasic 
-                          ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' 
-                          : isEvolved
-                          ? 'border-purple-500 shadow-lg shadow-purple-500/20'
-                          : isTrainer
-                          ? 'border-blue-500 shadow-lg shadow-blue-500/20'
-                          : isEnergy
-                          ? 'border-yellow-500 shadow-lg shadow-yellow-500/20'
-                          : 'border-gray-700'
-                      }`}
+                      className={`relative rounded-xl overflow-hidden border-2 bg-gradient-to-br ${getBgColor()} p-4 transition-all hover:scale-102 min-h-[280px]`}
                     >
-                      {/* Card Image */}
-                      {cardData?.image ? (
-                        <img 
-                          src={cardData.image} 
-                          alt={cardData.name}
-                          className="w-full h-auto"
-                        />
-                      ) : (
-                        <div className="aspect-[2.5/3.5] bg-[#0f0f10] flex items-center justify-center p-4">
-                          <div className="text-center">
-                            <p className="text-sm font-medium break-words">{card.name}</p>
-                            <p className="text-xs text-gray-500 mt-2">{card.setCode} {card.cardNumber}</p>
+                      {/* Card Number Badge */}
+                      <div className="absolute top-2 right-2">
+                        <span className="text-xs bg-black/70 text-white px-2 py-1 rounded-full font-bold">
+                          #{index + 1}
+                        </span>
+                      </div>
+                      
+                      {/* Pokemon Card */}
+                      {isPokemon && (
+                        <div className="space-y-2">
+                          {/* Header */}
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <h4 className="font-bold text-white text-lg leading-tight">{cardData.name}</h4>
+                              {cardData.hp && (
+                                <div className="text-sm font-semibold text-white/90">HP {cardData.hp}</div>
+                              )}
+                            </div>
+                            {cardData.types && cardData.types[0] && (
+                              <div className="ml-2 px-2 py-1 bg-black/30 rounded text-xs font-bold text-white">
+                                {cardData.types[0]}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Stage Badge */}
+                          <div className="mb-2">
+                            <span className={`text-xs px-2 py-1 rounded font-bold ${
+                              isBasic ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white'
+                            }`}>
+                              {cardData.subtypes?.join(' ') || 'Pokemon'}
+                            </span>
+                          </div>
+                          
+                          {/* Ability */}
+                          {cardData.abilities && cardData.abilities.length > 0 && (
+                            <div className="bg-black/30 rounded-lg p-2 text-xs">
+                              <div className="font-bold text-amber-400">{cardData.abilities[0].type}: {cardData.abilities[0].name}</div>
+                              <div className="text-gray-300 text-xs mt-1 line-clamp-2">{cardData.abilities[0].text}</div>
+                            </div>
+                          )}
+                          
+                          {/* Attacks */}
+                          {cardData.attacks && cardData.attacks.length > 0 && (
+                            <div className="space-y-1">
+                              {cardData.attacks.slice(0, 2).map((attack, i) => (
+                                <div key={i} className="bg-black/30 rounded-lg p-2 text-xs">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-bold text-white">{attack.name}</span>
+                                    {attack.damage && (
+                                      <span className="font-bold text-red-400">{attack.damage}</span>
+                                    )}
+                                  </div>
+                                  {attack.text && (
+                                    <div className="text-gray-300 text-xs mt-1 line-clamp-2">{attack.text}</div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Bottom Info */}
+                          <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10">
+                            {/* Weakness */}
+                            {cardData.weaknesses && cardData.weaknesses.length > 0 && (
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-400">Weak:</span>
+                                <span className="font-bold text-red-400">{cardData.weaknesses[0].type} {cardData.weaknesses[0].value}</span>
+                              </div>
+                            )}
+                            
+                            {/* Resistance */}
+                            {cardData.resistances && cardData.resistances.length > 0 && (
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-400">Resist:</span>
+                                <span className="font-bold text-blue-400">{cardData.resistances[0].type} {cardData.resistances[0].value}</span>
+                              </div>
+                            )}
+                            
+                            {/* Retreat */}
+                            {cardData.retreatCost && (
+                              <div className="flex items-center gap-1">
+                                <span className="text-gray-400">Retreat:</span>
+                                <span className="font-bold text-white">{cardData.retreatCost.length}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
                       
-                      {/* Card Type Badge */}
-                      <div className="absolute top-2 right-2">
-                        {isBasic && (
-                          <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full font-bold shadow-lg">
-                            BASIC
-                          </span>
-                        )}
-                        {isEvolved && cardData?.subtypes && (
-                          <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded-full font-bold shadow-lg">
-                            {cardData.subtypes.join(' ')}
-                          </span>
-                        )}
-                        {isTrainer && (
-                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full font-bold shadow-lg">
-                            TRAINER
-                          </span>
-                        )}
-                        {isEnergy && (
-                          <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded-full font-bold shadow-lg">
-                            ENERGY
-                          </span>
-                        )}
-                      </div>
+                      {/* Trainer Card */}
+                      {isTrainer && (
+                        <div className="space-y-3">
+                          {/* Header */}
+                          <div>
+                            <h4 className="font-bold text-white text-lg leading-tight mb-1">{cardData.name}</h4>
+                            <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded font-bold">
+                              {cardData.subtypes?.join(' ') || 'Trainer'}
+                            </span>
+                          </div>
+                          
+                          {/* Card Text */}
+                          {cardData.rules && (
+                            <div className="bg-black/30 rounded-lg p-3 text-xs text-gray-200 space-y-1">
+                              {cardData.rules.map((rule, i) => (
+                                <p key={i}>{rule}</p>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                       
-                      {/* Card Number */}
-                      <div className="absolute top-2 left-2">
-                        <span className="text-xs bg-black/80 text-white px-2 py-1 rounded-full font-bold">
-                          #{index + 1}
-                        </span>
-                      </div>
+                      {/* Energy Card */}
+                      {isEnergy && (
+                        <div className="space-y-3">
+                          {/* Header */}
+                          <div>
+                            <h4 className="font-bold text-white text-lg leading-tight mb-1">{cardData.name}</h4>
+                            <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded font-bold">
+                              {cardData.subtypes?.join(' ') || 'Energy'}
+                            </span>
+                          </div>
+                          
+                          {/* Energy Type */}
+                          {cardData.types && cardData.types.length > 0 && (
+                            <div className="bg-black/30 rounded-lg p-3 text-sm">
+                              <div className="font-bold text-yellow-400">Type: {cardData.types[0]}</div>
+                            </div>
+                          )}
+                          
+                          {/* Card Text */}
+                          {cardData.rules && (
+                            <div className="bg-black/30 rounded-lg p-3 text-xs text-gray-200 space-y-1">
+                              {cardData.rules.map((rule, i) => (
+                                <p key={i}>{rule}</p>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Unknown/Error Card */}
+                      {!isPokemon && !isTrainer && !isEnergy && (
+                        <div className="text-center py-8">
+                          <p className="text-sm font-medium text-white break-words mb-2">{card.name}</p>
+                          <p className="text-xs text-gray-400">{card.setCode} {card.cardNumber}</p>
+                          <p className="text-xs text-gray-500 mt-2">Card data not available</p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
