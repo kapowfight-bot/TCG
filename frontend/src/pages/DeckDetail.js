@@ -663,54 +663,73 @@ const DeckDetail = ({ user, onLogout }) => {
         )}
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-          <div className="glass rounded-2xl p-6">
-            <div className="text-sm text-gray-400 mb-1">Total Matches</div>
-            <div className="text-3xl font-bold">{stats.total_matches}</div>
+        <div className="glass rounded-2xl p-6 mb-8">
+          <div 
+            className="flex items-center justify-between cursor-pointer mb-4"
+            onClick={() => setIsMatchStatsExpanded(!isMatchStatsExpanded)}
+          >
+            <h3 className="text-xl font-bold">Match Statistics</h3>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-6 w-6 transition-transform duration-200 ${isMatchStatsExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
-          <div className="glass rounded-2xl p-6">
-            <div className="text-sm text-gray-400 mb-1">Win Rate</div>
-            <div className="text-3xl font-bold text-emerald-500">{stats.win_rate}%</div>
-            <div className="text-sm text-gray-500 mt-1">
-              {stats.wins}W - {stats.losses}L
+          {isMatchStatsExpanded && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+              <div className="bg-[#0f0f10] rounded-2xl p-6">
+                <div className="text-sm text-gray-400 mb-1">Total Matches</div>
+                <div className="text-3xl font-bold">{stats.total_matches}</div>
+              </div>
+              <div className="bg-[#0f0f10] rounded-2xl p-6">
+                <div className="text-sm text-gray-400 mb-1">Win Rate</div>
+                <div className="text-3xl font-bold text-emerald-500">{stats.win_rate}%</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {stats.wins}W - {stats.losses}L
+                </div>
+              </div>
+              <div className="bg-[#0f0f10] rounded-2xl p-6">
+                <div className="text-sm text-gray-400 mb-1">Going First</div>
+                <div className="text-xl font-bold text-blue-400">
+                  {stats.went_first_wins}W - {stats.went_first_losses}L
+                </div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {stats.went_first_wins + stats.went_first_losses > 0
+                    ? Math.round((stats.went_first_wins / (stats.went_first_wins + stats.went_first_losses)) * 100)
+                    : 0}% WR
+                </div>
+              </div>
+              <div className="bg-[#0f0f10] rounded-2xl p-6">
+                <div className="text-sm text-gray-400 mb-1">Going Second</div>
+                <div className="text-xl font-bold text-purple-400">
+                  {stats.went_second_wins}W - {stats.went_second_losses}L
+                </div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {stats.went_second_wins + stats.went_second_losses > 0
+                    ? Math.round((stats.went_second_wins / (stats.went_second_wins + stats.went_second_losses)) * 100)
+                    : 0}% WR
+                </div>
+              </div>
+              <div className="bg-[#0f0f10] rounded-2xl p-6">
+                <div className="text-sm text-gray-400 mb-1">Avg Mulligans</div>
+                <div className="text-3xl font-bold text-orange-400">{stats.avg_mulligans}</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {stats.total_mulligans} total
+                </div>
+              </div>
+              <div className="bg-[#0f0f10] rounded-2xl p-6">
+                <div className="text-sm text-gray-400 mb-1">Bad Games</div>
+                <div className="text-3xl font-bold text-red-400">{stats.bad_games}</div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {stats.total_matches > 0 ? Math.round((stats.bad_games / stats.total_matches) * 100) : 0}% of matches
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="glass rounded-2xl p-6">
-            <div className="text-sm text-gray-400 mb-1">Going First</div>
-            <div className="text-xl font-bold text-blue-400">
-              {stats.went_first_wins}W - {stats.went_first_losses}L
-            </div>
-            <div className="text-sm text-gray-500 mt-1">
-              {stats.went_first_wins + stats.went_first_losses > 0
-                ? Math.round((stats.went_first_wins / (stats.went_first_wins + stats.went_first_losses)) * 100)
-                : 0}% WR
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-6">
-            <div className="text-sm text-gray-400 mb-1">Going Second</div>
-            <div className="text-xl font-bold text-purple-400">
-              {stats.went_second_wins}W - {stats.went_second_losses}L
-            </div>
-            <div className="text-sm text-gray-500 mt-1">
-              {stats.went_second_wins + stats.went_second_losses > 0
-                ? Math.round((stats.went_second_wins / (stats.went_second_wins + stats.went_second_losses)) * 100)
-                : 0}% WR
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-6">
-            <div className="text-sm text-gray-400 mb-1">Avg Mulligans</div>
-            <div className="text-3xl font-bold text-orange-400">{stats.avg_mulligans}</div>
-            <div className="text-sm text-gray-500 mt-1">
-              {stats.total_mulligans} total
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-6">
-            <div className="text-sm text-gray-400 mb-1">Bad Games</div>
-            <div className="text-3xl font-bold text-red-400">{stats.bad_games}</div>
-            <div className="text-sm text-gray-500 mt-1">
-              {stats.total_matches > 0 ? Math.round((stats.bad_games / stats.total_matches) * 100) : 0}% of matches
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Matchup Stats */}
