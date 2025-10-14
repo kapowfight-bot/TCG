@@ -434,6 +434,27 @@ const Dashboard = ({ user, onLogout }) => {
                   </div>
                 </div>
 
+                {/* Test Results Preview */}
+                {deck.test_results && (
+                  <div className="bg-[#0f0f10] rounded-xl p-3 mb-3">
+                    <div className="text-xs text-gray-500 mb-2">Test Results</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-gray-400">Mulligan: </span>
+                        <span className="font-semibold text-orange-400">{deck.test_results.mulligan_percentage}%</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Avg: </span>
+                        <span className="font-semibold text-green-400">{deck.test_results.avg_pokemon}P</span>
+                        <span className="text-gray-600"> / </span>
+                        <span className="font-semibold text-blue-400">{deck.test_results.avg_trainer}T</span>
+                        <span className="text-gray-600"> / </span>
+                        <span className="font-semibold text-yellow-400">{deck.test_results.avg_energy}E</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-[#0f0f10] rounded-xl p-4">
                   <div className="text-sm text-gray-400 line-clamp-3 font-mono">
                     {deck.deck_list.split('\n').slice(0, 3).join('\n')}
