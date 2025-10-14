@@ -176,6 +176,18 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "DeckDetail.js lines 463-473 display going second W-L record and win rate. Will verify after backend testing."
+  
+  - task: "Edit Deck feature with test_results reset"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/DeckDetail.js, /app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Edit Deck button and dialog. Backend resets test_results when deck_list changes but keeps match history intact. Needs testing to verify functionality."
 
 metadata:
   created_by: "main_agent"
