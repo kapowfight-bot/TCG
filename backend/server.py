@@ -543,6 +543,68 @@ async def get_cards_count():
     count = await db.pokemon_cards.count_documents({})
     return {"count": count}
 
+@api_router.post("/cards/batch")
+async def save_cards_batch(cards: dict):
+    """Save multiple cards to database in batch (progressive population)"""
+    try:
+        saved_count = 0
+        skipped_count = 0
+        
+        for cache_key, card_data in cards.items():
+            # Extract set_code and card_number from cache_key (e.g., "MEW-123")
+            parts = cache_key.split('-')
+            if len(parts) < 2:
+                continue
+            
+            set_code = parts[0].upper()
+            card_number = '-'.join(parts[1:])  # Handle card numbers with dashes
+            card_id = f"{set_code.lower()}-{card_number}"
+            
+            # Check if card already exists
+            existing = await db.pokemon_cards.find_one({
+                "$or": [
+                    {"set_code": set_code, "card_number": card_number},
+                    {"card_id": card_id}
+                ]
+            })
+            
+            if existing:
+                skipped_count += 1
+                continue
+            
+            # Prepare card document for database
+            card_doc = {
+                "card_id": card_id,
+                "set_code": set_code,
+                "card_number": card_number,
+                "name": card_data.get("name"),
+                "supertype": card_data.get("supertype"),
+                "subtypes": card_data.get("subtypes", []),
+                "hp": card_data.get("hp"),
+                "types": card_data.get("types", []),
+                "abilities": card_data.get("abilities", []),
+                "attacks": card_data.get("attacks", []),
+                "weaknesses": card_data.get("weaknesses", []),
+                "resistances": card_data.get("resistances", []),
+                "retreat_cost": card_data.get("retreatCost", []),
+                "rules": card_data.get("rules", []),
+                "image_small": card_data.get("image"),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.pokemon_cards.insert_one(card_doc)
+            saved_count += 1
+        
+        return {
+            "message": "Cards saved successfully",
+            "saved": saved_count,
+            "skipped": skipped_count,
+            "total": saved_count + skipped_count
+        }
+    except Exception as e:
+        logger.error(f"Error saving cards batch: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save cards: {str(e)}")
+
 class TestResults(BaseModel):
     total_hands: int
     mulligan_count: int
