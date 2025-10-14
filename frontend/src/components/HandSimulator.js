@@ -97,16 +97,23 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
       const drawnHand = shuffled.slice(0, 7);
       
       // Get card data from cache for each card in hand
+      console.log('=== Drawing Hand ===');
+      console.log('Available cardData keys:', cardData ? Object.keys(cardData) : 'No cardData');
+      
       const handWithData = drawnHand.map(card => {
+        const cacheKey = `${card.setCode}-${card.cardNumber}`;
         const data = getCardData(card.setCode, card.cardNumber, card.name);
-        console.log(`Card: ${card.name} (${card.setCode}-${card.cardNumber})`, {
+        
+        console.log(`Card: ${card.name} (${cacheKey})`);
+        console.log('  Data found:', data.error ? 'NO' : 'YES');
+        console.log('  Image URL:', data.image);
+        console.log('  Type:', {
           isBasic: data.isBasic,
           isPokemon: data.isPokemon,
           isTrainer: data.isTrainer,
-          isEnergy: data.isEnergy,
-          supertype: data.supertype,
-          subtypes: data.subtypes
+          isEnergy: data.isEnergy
         });
+        
         return {
           ...card,
           data: data
@@ -115,8 +122,8 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
       
       const hasBasicPokemon = handWithData.some(card => card.data?.isBasic);
       
-      console.log('Hand with data:', handWithData);
       console.log('Has basic Pokemon:', hasBasicPokemon);
+      console.log('Hand drawn successfully');
       
       setHand(handWithData);
       setHasBasic(hasBasicPokemon);
