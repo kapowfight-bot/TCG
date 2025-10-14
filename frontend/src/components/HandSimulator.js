@@ -455,20 +455,23 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
       const pokemonCount = handWithData.filter(c => c.data?.isPokemon).length;
       const trainerCount = handWithData.filter(c => c.data?.isTrainer).length;
       const energyCount = handWithData.filter(c => c.data?.isEnergy).length;
+      const basicPokemonCount = handWithData.filter(c => c.data?.isPokemon && c.data?.isBasic).length;
       
       setTestStats(prev => ({
         totalHandsDrawn: prev.totalHandsDrawn + 1,
         totalPokemon: prev.totalPokemon + pokemonCount,
         totalTrainer: prev.totalTrainer + trainerCount,
         totalEnergy: prev.totalEnergy + energyCount,
-        totalCards: prev.totalCards + 7
+        totalCards: prev.totalCards + 7,
+        totalBasicPokemon: prev.totalBasicPokemon + basicPokemonCount
       }));
       
       console.log('Test stats updated:', {
         handsDrawn: testStats.totalHandsDrawn + 1,
         pokemon: pokemonCount,
         trainer: trainerCount,
-        energy: energyCount
+        energy: energyCount,
+        basicPokemon: basicPokemonCount
       });
       
       setHand(handWithData);
