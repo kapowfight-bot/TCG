@@ -422,17 +422,14 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
               </div>
 
               {/* Statistics */}
-              <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-[#0f0f10] rounded-xl p-4">
-                  <div className="text-sm text-gray-400 mb-1">Basic Pokemon</div>
-                  <div className="text-2xl font-bold text-emerald-500">
-                    {hand.filter(c => c.data?.isBasic).length}
+                  <div className="text-sm text-gray-400 mb-1">Pokemon</div>
+                  <div className="text-2xl font-bold text-green-400">
+                    {hand.filter(c => c.data?.isPokemon).length}
                   </div>
-                </div>
-                <div className="bg-[#0f0f10] rounded-xl p-4">
-                  <div className="text-sm text-gray-400 mb-1">Evolved Pokemon</div>
-                  <div className="text-2xl font-bold text-purple-400">
-                    {hand.filter(c => c.data?.isPokemon && !c.data?.isBasic).length}
+                  <div className="text-xs text-gray-500 mt-1">
+                    {selectedBasics.size} marked basic
                   </div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
