@@ -203,6 +203,18 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Added collapsible sections with chevron icons. Hand Simulator Test Results expanded by default, Match Statistics collapsed by default."
+  
+  - task: "Refresh Card Data button for old decks"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/HandSimulator.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Refresh Card Data button in hand simulator warning message. Fetches card data for old decks without requiring deletion/re-import. Preserves match history and all stats."
 
 metadata:
   created_by: "main_agent"
