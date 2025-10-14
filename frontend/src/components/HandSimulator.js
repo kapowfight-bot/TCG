@@ -931,6 +931,19 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
             </div>
           )}
         </div>
+        
+        {/* Hover Preview - Large Card Image */}
+        {hoveredCard && hoveredCard.data?.image && (
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+            <div className="bg-black/90 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border border-gray-700">
+              <img 
+                src={hoveredCard.data.image}
+                alt={hoveredCard.name}
+                className="max-w-[300px] max-h-[420px] rounded-xl"
+              />
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
