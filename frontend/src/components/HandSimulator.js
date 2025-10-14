@@ -3,11 +3,12 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import axios from 'axios';
 
-const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
+const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
   const [hand, setHand] = useState([]);
   const [mulliganCount, setMulliganCount] = useState(0);
-  const [hasBasic, setHasBasic] = useState(false);
+  const [selectedBasics, setSelectedBasics] = useState(new Set());
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Get card data from cached data
   const getCardData = (setCode, cardNumber, cardName) => {
