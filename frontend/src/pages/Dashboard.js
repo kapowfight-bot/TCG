@@ -58,6 +58,14 @@ const Dashboard = ({ user, onLogout }) => {
           );
           
           const card = response.data.data;
+          
+          // Debug logging
+          console.log(`Fetched ${card.name}:`, {
+            supertype: card.supertype,
+            subtypes: card.subtypes,
+            isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic')
+          });
+          
           cardDataMap[cacheKey] = {
             name: card.name,
             image: card.images?.small || null,
