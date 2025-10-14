@@ -145,6 +145,7 @@ const DeckDetail = ({ user, onLogout }) => {
     
     const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { setCode, cardNumber, section }]) => {
       try {
+        // Try local database first
         const response = await axios.get(
           `${API}/cards/${setCode}/${cardNumber}`,
           { withCredentials: true, timeout: 5000 }
@@ -173,18 +174,86 @@ const DeckDetail = ({ user, onLogout }) => {
             section: section
           }
         };
-      } catch (error) {
-        console.error(`Failed to fetch ${cacheKey}:`, error.message);
-        return null;
+      } catch (localError) {
+        // Fallback to external Pokemon TCG API
+        console.log(`Card ${cacheKey} not in local DB, trying external API...`);
+        
+        try {
+          let apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`;
+          let apiResponse;
+          
+          try {
+            apiResponse = await axios.get(apiUrl, { timeout: 5000 });
+          } catch (firstError) {
+            if (firstError.response?.status === 404) {
+              apiUrl = `https://api.pokemontcg.io/v2/cards/${setCode}-${cardNumber}`;
+              apiResponse = await axios.get(apiUrl, { timeout: 5000 });
+            } else {
+              throw firstError;
+            }
+          }
+          
+          const card = apiResponse.data.data;
+          return {
+            cacheKey,
+            fromExternalAPI: true,  // Mark for database saving
+            data: {
+              name: card.name,
+              image: card.images?.small || null,
+              supertype: card.supertype,
+              subtypes: card.subtypes || [],
+              hp: card.hp || null,
+              types: card.types || [],
+              abilities: card.abilities || [],
+              attacks: card.attacks || [],
+              weaknesses: card.weaknesses || [],
+              resistances: card.resistances || [],
+              retreatCost: card.retreatCost || [],
+              rules: card.rules || [],
+              isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+              isPokemon: section === 'pokemon',
+              isTrainer: section === 'trainer',
+              isEnergy: section === 'energy',
+              section: section
+            }
+          };
+        } catch (apiError) {
+          console.error(`Failed to fetch ${cacheKey} from both sources:`, apiError.message);
+          return null;
+        }
       }
     });
     
     const results = await Promise.all(fetchPromises);
+    
+    // Track which cards came from external API (need to be saved to DB)
+    const cardsToSave = {};
+    
     results.forEach(result => {
       if (result) {
         cardDataMap[result.cacheKey] = result.data;
+        // If card has 'fromExternalAPI' flag, add to batch save
+        if (result.fromExternalAPI) {
+          cardsToSave[result.cacheKey] = result.data;
+        }
       }
     });
+    
+    // Save newly fetched cards to local database for future use
+    if (Object.keys(cardsToSave).length > 0) {
+      try {
+        console.log(`Saving ${Object.keys(cardsToSave).length} new cards to local database...`);
+        await axios.post(
+          `${API}/cards/batch`,
+          cardsToSave,
+          { withCredentials: true, timeout: 10000 }
+        );
+        console.log('Cards saved to local database successfully');
+      } catch (saveError) {
+        console.error('Failed to save cards to database:', saveError);
+        // Don't fail the whole operation if saving fails
+      }
+    }
     
     return cardDataMap;
   };
