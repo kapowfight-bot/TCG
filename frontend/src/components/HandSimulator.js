@@ -158,15 +158,26 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
       
       const handWithData = drawnHand.map(card => {
         const cacheKey = `${card.setCode}-${card.cardNumber}`;
-        const data = getCardData(card.setCode, card.cardNumber, card.name);
+        const cachedData = getCardData(card.setCode, card.cardNumber, card.name);
+        
+        // Merge cached image data with section-based type info
+        const isPokemon = card.section === 'pokemon';
+        const isTrainer = card.section === 'trainer';
+        const isEnergy = card.section === 'energy';
+        
+        const data = {
+          ...cachedData,
+          // Override type info from deck list sections (more reliable)
+          isPokemon: isPokemon,
+          isTrainer: isTrainer,
+          isEnergy: isEnergy,
+          supertype: isPokemon ? 'Pokémon' : (isTrainer ? 'Trainer' : (isEnergy ? 'Energy' : cachedData.supertype))
+        };
         
         console.log(`Card: ${card.name} (${cacheKey})`);
-        console.log('  Data found:', data.error ? 'NO' : 'YES');
+        console.log('  Section:', card.section);
         console.log('  Image URL:', data.image);
-        console.log('  isPokemon:', data.isPokemon);
-        console.log('  isTrainer:', data.isTrainer);
-        console.log('  isEnergy:', data.isEnergy);
-        console.log('  Supertype:', data.supertype);
+        console.log('  Type:', { isPokemon, isTrainer, isEnergy });
         
         return {
           ...card,
