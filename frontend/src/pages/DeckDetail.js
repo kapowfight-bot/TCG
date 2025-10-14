@@ -105,6 +105,132 @@ const DeckDetail = ({ user, onLogout }) => {
     }
   };
 
+  const fetchCardDataForDeck = async (deckListText) => {
+    const cardDataMap = {};
+    const lines = deckListText.split('\n');
+    
+    const uniqueCards = new Map();
+    let currentSection = 'unknown';
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+      
+      if (trimmedLine.match(/^Pokémon:/i) || trimmedLine.match(/^Pokemon:/i)) {
+        currentSection = 'pokemon';
+        continue;
+      }
+      if (trimmedLine.match(/^Trainer:/i)) {
+        currentSection = 'trainer';
+        continue;
+      }
+      if (trimmedLine.match(/^Energy:/i)) {
+        currentSection = 'energy';
+        continue;
+      }
+      
+      const match = trimmedLine.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+      if (match) {
+        const setCode = match[3].toUpperCase();
+        const cardNumber = match[4];
+        const cacheKey = `${setCode}-${cardNumber}`;
+        
+        if (!uniqueCards.has(cacheKey)) {
+          uniqueCards.set(cacheKey, { setCode, cardNumber, section: currentSection });
+        }
+      }
+    }
+    
+    const fetchPromises = Array.from(uniqueCards.entries()).map(async ([cacheKey, { setCode, cardNumber, section }]) => {
+      try {
+        const response = await axios.get(
+          `${API}/cards/${setCode}/${cardNumber}`,
+          { withCredentials: true, timeout: 5000 }
+        );
+        
+        const card = response.data;
+        return {
+          cacheKey,
+          data: {
+            name: card.name,
+            image: card.image_small || null,
+            supertype: card.supertype,
+            subtypes: card.subtypes || [],
+            hp: card.hp || null,
+            types: card.types || [],
+            abilities: card.abilities || [],
+            attacks: card.attacks || [],
+            weaknesses: card.weaknesses || [],
+            resistances: card.resistances || [],
+            retreatCost: card.retreat_cost || [],
+            rules: card.rules || [],
+            isBasic: card.supertype === 'Pokémon' && card.subtypes?.includes('Basic'),
+            isPokemon: section === 'pokemon',
+            isTrainer: section === 'trainer',
+            isEnergy: section === 'energy',
+            section: section
+          }
+        };
+      } catch (error) {
+        console.error(`Failed to fetch ${cacheKey}:`, error.message);
+        return null;
+      }
+    });
+    
+    const results = await Promise.all(fetchPromises);
+    results.forEach(result => {
+      if (result) {
+        cardDataMap[result.cacheKey] = result.data;
+      }
+    });
+    
+    return cardDataMap;
+  };
+
+  const handleEditDeck = async () => {
+    if (!editDeckName.trim() || !editDeckList.trim()) {
+      toast.error('Please enter both deck name and deck list');
+      return;
+    }
+
+    setIsEditSubmitting(true);
+    try {
+      // Fetch card data for the updated deck list
+      const lines = editDeckList.split('\n').filter(line => line.trim());
+      const uniqueCards = new Set();
+      lines.forEach(line => {
+        const match = line.match(/^(\d+)\s+(.+?)\s+([A-Z]{2,5})\s+(\d+)$/i);
+        if (match) {
+          uniqueCards.add(`${match[3]}-${match[4]}`);
+        }
+      });
+      
+      toast.info(`Fetching ${uniqueCards.size} unique cards...`);
+      const cardData = await fetchCardDataForDeck(editDeckList);
+      toast.success(`Fetched ${Object.keys(cardData).length} cards`);
+      
+      // Update deck via API
+      await axios.put(
+        `${API}/decks/${deckId}`,
+        {
+          deck_name: editDeckName,
+          deck_list: editDeckList,
+          card_data: cardData,
+        },
+        { withCredentials: true }
+      );
+
+      toast.success('Deck updated successfully! Test results have been reset.');
+      setIsEditDialogOpen(false);
+      fetchDeckData();
+    } catch (error) {
+      console.error('Error updating deck:', error);
+      toast.error('Failed to update deck');
+    } finally {
+      setIsEditSubmitting(false);
+    }
+  };
+
   const handleDeleteDeck = async () => {
     try {
       await axios.delete(`${API}/decks/${deckId}`, { withCredentials: true });
