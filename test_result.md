@@ -112,27 +112,33 @@ user_problem_statement: |
 backend:
   - task: "Save test results endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint POST /api/decks/{deck_id}/test-results implemented. Needs testing to verify it saves test results correctly."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL TEST PASSED: POST /api/decks/{deck_id}/test-results successfully saves test results to deck. Fixed missing test_results field in Deck model. Verified test results are saved to database and returned in API responses. All 6 test metrics (total_hands, mulligan_count, mulligan_percentage, avg_pokemon, avg_trainer, avg_energy) plus last_tested timestamp are correctly stored and retrieved."
   
   - task: "Calculate going second stats in stats endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Stats endpoint GET /api/decks/{deck_id}/stats already calculates went_second_wins and went_second_losses. Needs testing to verify correctness."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL TEST PASSED: GET /api/decks/{deck_id}/stats correctly calculates and returns went_second_wins and went_second_losses. Created test matches with went_first=false and verified calculations are accurate. Stats endpoint returns all required fields including went_first_wins, went_first_losses, went_second_wins, went_second_losses with correct integer values."
 
 frontend:
   - task: "Display test results on Dashboard"
