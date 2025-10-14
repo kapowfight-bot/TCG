@@ -305,7 +305,7 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
                     <div
                       key={card.id}
                       data-testid={`hand-card-${index}`}
-                      className={`rounded-xl overflow-hidden border-4 transition-all hover:scale-105 ${
+                      className={`relative rounded-xl overflow-hidden border-4 transition-all hover:scale-105 ${
                         isBasic 
                           ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' 
                           : isEvolved
