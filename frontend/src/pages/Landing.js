@@ -35,6 +35,8 @@ const Landing = ({ onAuth }) => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Authentication error:', error);
+      // Clear the URL fragment even on error
+      window.location.hash = '';
       toast.error('Failed to authenticate. Please try again.');
       setIsProcessing(false);
     }
