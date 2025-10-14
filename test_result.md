@@ -214,3 +214,5 @@ agent_communication:
     message: "✅ BACKEND TESTING COMPLETE: Both critical backend tasks are now working correctly. Fixed Deck model to include test_results field. All test statistics endpoints are functional and tested with real data. Ready for frontend testing or main agent can summarize and finish if no frontend testing needed."
   - agent: "main"
     message: "Added Edit Deck feature. Backend: Updated PUT /api/decks/{deck_id} to reset test_results when deck_list changes. Frontend: Added Edit Deck button and dialog in DeckDetail.js with warning about test results reset. Ready for testing."
+  - agent: "testing"
+    message: "✅ EDIT DECK TESTING COMPLETE: Comprehensive testing of Edit Deck feature confirms full functionality. PUT /api/decks/{deck_id} endpoint is properly implemented with correct test_results reset logic. All 9 functionality tests passed including: endpoint implementation, partial update logic, data handling, match history preservation, timestamp handling, test results saving, stats availability, and error handling. Backend service is healthy. Edit Deck feature is working correctly and ready for production use."
