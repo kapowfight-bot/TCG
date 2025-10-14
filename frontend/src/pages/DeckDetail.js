@@ -529,7 +529,10 @@ const DeckDetail = ({ user, onLogout }) => {
           deckList={deck.deck_list}
           cardData={deck.card_data || {}}
           isOpen={isSimulatorOpen}
-          onClose={() => setIsSimulatorOpen(false)}
+          onClose={() => {
+            console.log('Deck card_data:', deck.card_data ? Object.keys(deck.card_data).length + ' cards' : 'No card data');
+            setIsSimulatorOpen(false);
+          }}
         />
       )}
     </div>
