@@ -11,7 +11,7 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
   const [cardCache, setCardCache] = useState({});
 
   // Fetch card data from Pokemon TCG API
-  const fetchCardData = async (setCode, cardNumber) => {
+  const fetchCardData = async (setCode, cardNumber, cardName) => {
     const cacheKey = `${setCode}-${cardNumber}`;
     
     // Check cache first
@@ -21,7 +21,8 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
     
     try {
       const response = await axios.get(
-        `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`
+        `https://api.pokemontcg.io/v2/cards/${setCode.toLowerCase()}-${cardNumber}`,
+        { timeout: 5000 }
       );
       
       const card = response.data.data;
@@ -41,18 +42,25 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
       
       return cardData;
     } catch (error) {
-      console.error('Error fetching card:', error);
-      // Return fallback data
-      return {
-        name: 'Unknown Card',
+      console.error(`Error fetching card ${setCode}-${cardNumber}:`, error.message);
+      
+      // Return fallback data with card name
+      const fallbackData = {
+        name: cardName,
         image: null,
         supertype: 'Unknown',
         subtypes: [],
         isBasic: false,
         isPokemon: false,
         isTrainer: false,
-        isEnergy: false
+        isEnergy: false,
+        error: true
       };
+      
+      // Cache the fallback to avoid repeated failed requests
+      setCardCache(prev => ({ ...prev, [cacheKey]: fallbackData }));
+      
+      return fallbackData;
     }
   };
 
