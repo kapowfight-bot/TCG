@@ -199,9 +199,10 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
 
   // Handle mulligan (no basic Pokemon in hand)
   const handleMulligan = () => {
+    console.log('Mulligan clicked - redrawing hand');
     setMulliganCount(prev => prev + 1);
     setSelectedBasics(new Set());
-    drawHand();
+    drawHand(true); // Force redraw regardless of selections
   };
 
   // Toggle Pokemon as basic
