@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Card } from './ui/card';
 
 const HandSimulator = ({ deckList, isOpen, onClose }) => {
   const [hand, setHand] = useState([]);
