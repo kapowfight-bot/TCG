@@ -543,6 +543,41 @@ async def get_cards_count():
     count = await db.pokemon_cards.count_documents({})
     return {"count": count}
 
+@api_router.get("/cards/image/{set_code}/{card_number}")
+async def get_card_image_from_limitless(set_code: str, card_number: str):
+    """Fetch card image URL from LimitlessTCG"""
+    try:
+        # LimitlessTCG URL pattern
+        limitless_url = f"https://limitlesstcg.com/cards/{set_code.upper()}/{card_number}"
+        
+        async with httpx.AsyncClient(timeout=10.0) as http_client:
+            response = await http_client.get(limitless_url)
+            response.raise_for_status()
+            
+            html = response.text
+            
+            # Extract image URL from HTML
+            # Look for the large card image in the page
+            import re
+            
+            # Pattern: limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/{SET}/{SET}_{NUM}_*_EN_LG.png
+            pattern = r'https://limitlesstcg\.nyc3\.cdn\.digitaloceanspaces\.com/tpci/[^"]+\.png'
+            matches = re.findall(pattern, html)
+            
+            if matches:
+                # Get the large image (LG suffix)
+                large_images = [m for m in matches if '_LG.png' in m or '_R_EN_LG.png' in m]
+                if large_images:
+                    return {"image_url": large_images[0]}
+                # Fallback to any image found
+                return {"image_url": matches[0]}
+            
+            return {"image_url": None, "error": "Image not found in page"}
+            
+    except Exception as e:
+        logger.error(f"Error fetching image from LimitlessTCG: {str(e)}")
+        return {"image_url": None, "error": str(e)}
+
 @api_router.post("/cards/batch")
 async def save_cards_batch(cards: dict):
     """Save multiple cards to database in batch (progressive population)"""
