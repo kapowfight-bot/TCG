@@ -1,0 +1,58 @@
+{
+  "total_tests": 10,
+  "passed_tests": 10,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "test_results": [
+    {
+      "test": "Backend Health Check",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Auth Me (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Create Session (Invalid)",
+      "success": true,
+      "details": "Status: 400"
+    },
+    {
+      "test": "Logout (Unauthenticated)",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Get Decks (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Create Deck (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Get Matches (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Create Match (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Get Deck Stats (Unauthenticated)",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Non-existent Endpoint",
+      "success": true,
+      "details": "Status: 404"
+    }
+  ]
+}
