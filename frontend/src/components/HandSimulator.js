@@ -186,12 +186,13 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
             <Button
               data-testid="draw-hand-btn"
               onClick={() => drawHand(false)}
+              disabled={isLoading}
               className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
             >
-              Draw Opening Hand
+              {isLoading ? 'Loading Cards...' : 'Draw Opening Hand'}
             </Button>
             
-            {hand.length > 0 && !hasBasic && (
+            {hand.length > 0 && !hasBasic && !isLoading && (
               <Button
                 data-testid="mulligan-btn"
                 onClick={() => drawHand(true)}
@@ -201,7 +202,7 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
               </Button>
             )}
             
-            {hand.length > 0 && (
+            {hand.length > 0 && !isLoading && (
               <Button
                 onClick={reset}
                 variant="outline"
