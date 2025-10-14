@@ -252,7 +252,7 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
                 {hand.map((card, index) => {
                   const cardData = card.data;
                   const isBasic = cardData?.isBasic;
@@ -261,86 +261,89 @@ const HandSimulator = ({ deckList, cardData, isOpen, onClose }) => {
                   const isEnergy = cardData?.isEnergy;
                   const isEvolved = isPokemon && !isBasic;
                   
-                  // Get border and text color based on type
-                  const getCardStyle = () => {
-                    if (isBasic) return {
-                      border: 'border-emerald-500',
-                      bg: 'bg-emerald-500/10',
-                      text: 'text-emerald-400',
-                      label: 'BASIC'
-                    };
-                    if (isEvolved) return {
-                      border: 'border-purple-500',
-                      bg: 'bg-purple-500/10',
-                      text: 'text-purple-400',
-                      label: cardData.subtypes?.filter(s => s !== 'Pokémon').join(' ') || 'EVOLVED'
-                    };
-                    if (isTrainer) return {
-                      border: 'border-blue-500',
-                      bg: 'bg-blue-500/10',
-                      text: 'text-blue-400',
-                      label: cardData.subtypes?.[0] || 'TRAINER'
-                    };
-                    if (isEnergy) return {
-                      border: 'border-yellow-500',
-                      bg: 'bg-yellow-500/10',
-                      text: 'text-yellow-400',
-                      label: 'ENERGY'
-                    };
-                    return {
-                      border: 'border-gray-600',
-                      bg: 'bg-gray-600/10',
-                      text: 'text-gray-400',
-                      label: 'UNKNOWN'
-                    };
+                  // Get border color based on type
+                  const getBorderColor = () => {
+                    if (isBasic) return 'border-emerald-500 shadow-emerald-500/50';
+                    if (isEvolved) return 'border-purple-500 shadow-purple-500/50';
+                    if (isTrainer) return 'border-blue-500 shadow-blue-500/50';
+                    if (isEnergy) return 'border-yellow-500 shadow-yellow-500/50';
+                    return 'border-gray-600 shadow-gray-600/50';
                   };
                   
-                  const style = getCardStyle();
+                  // Get type label
+                  const getTypeLabel = () => {
+                    if (isBasic) return { text: 'BASIC', color: 'bg-emerald-500' };
+                    if (isEvolved) return { 
+                      text: cardData.subtypes?.filter(s => s !== 'Pokémon').join(' ') || 'EVOLVED',
+                      color: 'bg-purple-500'
+                    };
+                    if (isTrainer) return { 
+                      text: cardData.subtypes?.[0] || 'TRAINER',
+                      color: 'bg-blue-500'
+                    };
+                    if (isEnergy) return { text: 'ENERGY', color: 'bg-yellow-500' };
+                    return { text: 'LOADING', color: 'bg-gray-600' };
+                  };
+                  
+                  const typeLabel = getTypeLabel();
                   
                   return (
                     <div
                       key={card.id}
                       data-testid={`hand-card-${index}`}
-                      className={`relative rounded-lg border-4 ${style.border} ${style.bg} p-3 transition-all hover:scale-105 hover:shadow-lg min-h-[160px] flex flex-col`}
+                      className={`relative rounded-xl border-4 ${getBorderColor()} transition-all hover:scale-105 shadow-lg overflow-hidden bg-[#0a0a0b]`}
                     >
-                      {/* Card Number Badge */}
-                      <div className="absolute top-1 right-1">
-                        <span className="text-xs bg-black/80 text-white px-2 py-0.5 rounded-full font-bold">
-                          #{index + 1}
-                        </span>
-                      </div>
-                      
-                      {/* Card Name */}
-                      <div className="mb-2 pr-8">
-                        <h4 className="font-bold text-white text-sm leading-tight line-clamp-2">
-                          {cardData?.name || card.name}
-                        </h4>
-                      </div>
-                      
-                      {/* Type Badge */}
-                      <div className="mb-2">
-                        <span className={`text-xs ${style.text} font-bold px-2 py-1 rounded ${style.bg} border ${style.border}`}>
-                          {style.label}
-                        </span>
-                      </div>
-                      
-                      {/* Debug Info - Show if data exists */}
-                      {cardData?.error && (
-                        <div className="mb-2">
-                          <p className="text-xs text-red-400">Data not cached</p>
+                      {/* Card Image */}
+                      {cardData?.image ? (
+                        <img 
+                          src={cardData.image}
+                          alt={cardData.name || card.name}
+                          className="w-full h-auto"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="aspect-[2.5/3.5] bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center p-4">
+                          <div className="text-center">
+                            <div className="w-12 h-12 mx-auto mb-3 bg-gray-700 rounded-lg flex items-center justify-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6 text-gray-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                />
+                              </svg>
+                            </div>
+                            <p className="text-sm font-medium text-white break-words mb-2">
+                              {card.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {card.setCode} {card.cardNumber}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1">
+                              Image not available
+                            </p>
+                          </div>
                         </div>
                       )}
                       
-                      {/* Card Set Info */}
-                      <div className="mt-auto">
-                        <p className="text-xs text-gray-500">
-                          {card.setCode} {card.cardNumber}
-                        </p>
-                        {cardData?.supertype && (
-                          <p className="text-xs text-gray-600">
-                            {cardData.supertype}
-                          </p>
-                        )}
+                      {/* Overlay badges */}
+                      <div className="absolute top-2 left-2 right-2 flex items-start justify-between">
+                        {/* Card Number */}
+                        <span className="text-xs bg-black/90 text-white px-2 py-1 rounded-full font-bold shadow-lg">
+                          #{index + 1}
+                        </span>
+                        
+                        {/* Type Badge */}
+                        <span className={`text-xs ${typeLabel.color} text-white px-2 py-1 rounded-full font-bold shadow-lg`}>
+                          {typeLabel.text}
+                        </span>
                       </div>
                     </div>
                   );
