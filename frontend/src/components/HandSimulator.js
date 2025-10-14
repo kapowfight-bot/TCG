@@ -339,10 +339,18 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
                 {hand.map((card, index) => {
                   const cardData = card.data;
-                  const isPokemon = cardData?.isPokemon;
-                  const isTrainer = cardData?.isTrainer;
-                  const isEnergy = cardData?.isEnergy;
+                  const isPokemon = cardData?.isPokemon === true;
+                  const isTrainer = cardData?.isTrainer === true;
+                  const isEnergy = cardData?.isEnergy === true;
                   const isSelected = selectedBasics.has(card.id);
+                  
+                  console.log(`Rendering card ${index}: ${card.name}`, {
+                    isPokemon,
+                    isTrainer,
+                    isEnergy,
+                    supertype: cardData?.supertype,
+                    isSelected
+                  });
                   
                   // Get border color based on type
                   const getBorderColor = () => {
@@ -357,7 +365,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
                     if (isPokemon) return { text: 'POKEMON', color: isSelected ? 'bg-emerald-500' : 'bg-green-500' };
                     if (isTrainer) return { text: 'TRAINER', color: 'bg-blue-500' };
                     if (isEnergy) return { text: 'ENERGY', color: 'bg-yellow-500' };
-                    return { text: 'CARD', color: 'bg-gray-600' };
+                    return { text: 'UNKNOWN', color: 'bg-gray-600' };
                   };
                   
                   const typeLabel = getTypeLabel();
