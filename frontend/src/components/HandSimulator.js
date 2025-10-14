@@ -5,12 +5,13 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { API } from '../App';
 
-const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose }) => {
+const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpdate }) => {
   const [hand, setHand] = useState([]);
   const [mulliganCount, setMulliganCount] = useState(0);
   const [selectedBasics, setSelectedBasics] = useState(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Test statistics tracking
   const [testStats, setTestStats] = useState({
