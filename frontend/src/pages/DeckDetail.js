@@ -40,6 +40,10 @@ const DeckDetail = ({ user, onLogout }) => {
   const [matchNotes, setMatchNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editDeckName, setEditDeckName] = useState('');
+  const [editDeckList, setEditDeckList] = useState('');
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   useEffect(() => {
     fetchDeckData();
