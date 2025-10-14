@@ -106,12 +106,36 @@ const HandSimulator = ({ deckList, isOpen, onClose }) => {
 
         <div className="space-y-6 mt-4">
           {/* Instructions */}
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-            <h3 className="font-semibold text-blue-400 mb-2">Pokemon TCG Mulligan Rule</h3>
-            <p className="text-sm text-gray-300">
-              If you don't have a Basic Pokemon in your opening hand, you must mulligan (shuffle and redraw).
-              Your opponent draws 1 card for each mulligan.
-            </p>
+          <div className="space-y-4">
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+              <h3 className="font-semibold text-blue-400 mb-2">Pokemon TCG Mulligan Rule</h3>
+              <p className="text-sm text-gray-300">
+                If you don't have a Basic Pokemon in your opening hand, you must mulligan (shuffle and redraw).
+                Your opponent draws 1 card for each mulligan.
+              </p>
+            </div>
+            
+            <div className="bg-[#0f0f10] rounded-xl p-4">
+              <h3 className="font-semibold mb-3">Card Type Legend</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                  <span>Basic Pokemon</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                  <span>Evolved Pokemon</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <span>Trainer Cards</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <span>Energy Cards</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Controls */}
