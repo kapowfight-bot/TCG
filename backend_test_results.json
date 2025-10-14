@@ -1,6 +1,6 @@
 {
-  "total_tests": 14,
-  "passed_tests": 14,
+  "total_tests": 23,
+  "passed_tests": 23,
   "failed_tests": 0,
   "success_rate": 100.0,
   "test_results": [
@@ -65,6 +65,16 @@
       "details": "Status: 422"
     },
     {
+      "test": "Test Results Data Validation",
+      "success": true,
+      "details": "Status: 422"
+    },
+    {
+      "test": "Stats Endpoint Structure",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
       "test": "Cards Count Endpoint",
       "success": true,
       "details": "Status: 200"
@@ -73,6 +83,41 @@
       "test": "Card Lookup Endpoint",
       "success": true,
       "details": "Status: 404"
+    },
+    {
+      "test": "Endpoint Exists: GET /auth/me",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Endpoint Exists: POST /auth/session",
+      "success": true,
+      "details": "Status: 422"
+    },
+    {
+      "test": "Endpoint Exists: POST /auth/logout",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Endpoint Exists: GET /decks",
+      "success": true,
+      "details": "Status: 401"
+    },
+    {
+      "test": "Endpoint Exists: POST /decks",
+      "success": true,
+      "details": "Status: 422"
+    },
+    {
+      "test": "Endpoint Exists: POST /matches",
+      "success": true,
+      "details": "Status: 422"
+    },
+    {
+      "test": "Endpoint Exists: GET /cards/count",
+      "success": true,
+      "details": "Status: 200"
     }
   ]
 }
