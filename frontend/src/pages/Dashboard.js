@@ -619,6 +619,96 @@ const Dashboard = ({ user, onLogout }) => {
                 </div>
               </div>
             ))}
+              </div>
+            </div>
+
+            {/* Meta Wizard - 1 column */}
+            <div className="lg:col-span-1">
+              <div className="glass rounded-2xl p-6 sticky top-6">
+                <h3 className="text-2xl font-bold mb-4 text-white">🔮 Meta Wizard</h3>
+                
+                <div className="mb-4">
+                  <label className="text-sm text-gray-400 mb-2 block">Select Deck</label>
+                  <select
+                    value={selectedDeckForMeta?.id || ''}
+                    onChange={(e) => {
+                      const deck = decks.find(d => d.id === e.target.value);
+                      setSelectedDeckForMeta(deck);
+                      setMetaData(null);
+                    }}
+                    className="w-full bg-[#0f0f10] border border-gray-700 text-white rounded-xl p-3"
+                  >
+                    <option value="">Choose a deck...</option>
+                    {decks.map((deck) => (
+                      <option key={deck.id} value={deck.id}>
+                        {deck.deck_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <Button
+                  onClick={() => selectedDeckForMeta && fetchMetaWizard(selectedDeckForMeta.deck_name)}
+                  disabled={!selectedDeckForMeta || isLoadingMeta}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl mb-4"
+                >
+                  {isLoadingMeta ? 'Loading...' : '✨ DO MAGIC'}
+                </Button>
+
+                {/* Meta Data Display */}
+                {metaData && (
+                  <div className="space-y-4">
+                    {/* Best Matchups */}
+                    <div>
+                      <h4 className="text-lg font-bold text-emerald-400 mb-2">✅ Best Matchups</h4>
+                      <div className="space-y-2">
+                        {metaData.best_matchups.map((matchup, idx) => (
+                          <div key={idx} className="bg-[#0f0f10] rounded-lg p-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-300">{matchup.opponent}</span>
+                              <span className="text-emerald-400 font-bold">{matchup.win_rate}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Worst Matchups */}
+                    <div>
+                      <h4 className="text-lg font-bold text-red-400 mb-2">❌ Worst Matchups</h4>
+                      <div className="space-y-2">
+                        {metaData.worst_matchups.map((matchup, idx) => (
+                          <div key={idx} className="bg-[#0f0f10] rounded-lg p-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-300">{matchup.opponent}</span>
+                              <span className="text-red-400 font-bold">{matchup.win_rate}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Source */}
+                    <div className="text-xs text-gray-500 text-center">
+                      Data from {metaData.source}
+                      {metaData.note && <div className="mt-1 text-yellow-500">{metaData.note}</div>}
+                    </div>
+                  </div>
+                )}
+
+                {!metaData && !isLoadingMeta && selectedDeckForMeta && (
+                  <div className="text-center py-8 text-gray-500">
+                    Click "DO MAGIC" to fetch meta data
+                  </div>
+                )}
+
+                {!selectedDeckForMeta && (
+                  <div className="text-center py-8 text-gray-500">
+                    Select a deck to see its meta matchups
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </main>
