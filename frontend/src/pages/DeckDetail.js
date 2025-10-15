@@ -919,49 +919,64 @@ const DeckDetail = ({ user, onLogout }) => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {matches.map((match) => (
-                <div
-                  key={match.id}
-                  data-testid={`match-${match.id}`}
-                  className="bg-[#0f0f10] rounded-xl p-4"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-sm font-semibold ${
-                            match.result === 'win'
-                              ? 'bg-emerald-500/20 text-emerald-500'
-                              : 'bg-red-500/20 text-red-500'
-                          }`}
-                        >
-                          {match.result === 'win' ? 'WIN' : 'LOSS'}
-                        </span>
-                        {match.bad_game && (
-                          <span className="px-3 py-1 rounded-lg text-sm font-semibold bg-orange-500/20 text-orange-500">
-                            Bad Game
+            <>
+              <div className="space-y-3">
+                {matches.slice(0, visibleMatchesCount).map((match) => (
+                  <div
+                    key={match.id}
+                    data-testid={`match-${match.id}`}
+                    className="bg-[#0f0f10] rounded-xl p-4"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <span
+                            className={`px-3 py-1 rounded-lg text-sm font-semibold ${
+                              match.result === 'win'
+                                ? 'bg-emerald-500/20 text-emerald-500'
+                                : 'bg-red-500/20 text-red-500'
+                            }`}
+                          >
+                            {match.result === 'win' ? 'WIN' : 'LOSS'}
                           </span>
-                        )}
-                        <span className="text-sm text-gray-500">
-                          Went {match.went_first ? 'First' : 'Second'}
-                        </span>
-                      </div>
-                      <div className="text-white font-semibold mb-1">vs {match.opponent_deck_name}</div>
-                      {match.mulligan_count > 0 && (
-                        <div className="text-sm text-orange-400 mt-1">
-                          {match.mulligan_count} mulligan{match.mulligan_count !== 1 ? 's' : ''}
+                          {match.bad_game && (
+                            <span className="px-3 py-1 rounded-lg text-sm font-semibold bg-orange-500/20 text-orange-500">
+                              Bad Game
+                            </span>
+                          )}
+                          <span className="text-sm text-gray-500">
+                            Went {match.went_first ? 'First' : 'Second'}
+                          </span>
                         </div>
-                      )}
-                      {match.notes && <div className="text-sm text-gray-400 mt-2">{match.notes}</div>}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(match.match_date).toLocaleDateString()}
+                        <div className="text-white font-semibold mb-1">vs {match.opponent_deck_name}</div>
+                        {match.mulligan_count > 0 && (
+                          <div className="text-sm text-orange-400 mt-1">
+                            {match.mulligan_count} mulligan{match.mulligan_count !== 1 ? 's' : ''}
+                          </div>
+                        )}
+                        {match.notes && <div className="text-sm text-gray-400 mt-2">{match.notes}</div>}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(match.match_date).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+              
+              {/* Load More Button */}
+              {visibleMatchesCount < matches.length && (
+                <div className="mt-4 text-center">
+                  <Button
+                    onClick={() => setVisibleMatchesCount(prev => prev + 5)}
+                    variant="outline"
+                    className="border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
+                  >
+                    Load More ({matches.length - visibleMatchesCount} remaining)
+                  </Button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </main>
