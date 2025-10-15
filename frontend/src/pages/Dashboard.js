@@ -556,12 +556,26 @@ const Dashboard = ({ user, onLogout }) => {
                   }
                   
                   return featuredImage ? (
-                    <div className="bg-[#0f0f10] rounded-xl p-4 flex justify-center">
-                      <img 
-                        src={featuredImage} 
-                        alt={deck.deck_name}
-                        className="max-h-[200px] rounded-lg"
-                      />
+                    <div className="bg-[#0f0f10] rounded-xl p-4 relative">
+                      <div className="flex justify-center">
+                        <img 
+                          src={featuredImage} 
+                          alt={deck.deck_name}
+                          className="max-h-[200px] rounded-lg"
+                        />
+                      </div>
+                      {/* Win Rate Overlay */}
+                      {deck.stats && deck.stats.total_matches > 0 && (
+                        <div className="absolute bottom-6 right-6 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-emerald-500/50">
+                          <div className="text-xs text-gray-400">Win Rate</div>
+                          <div className="text-2xl font-bold text-emerald-400">
+                            {deck.stats.win_rate}%
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {deck.stats.wins}W - {deck.stats.losses}L
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="bg-[#0f0f10] rounded-xl p-4">
