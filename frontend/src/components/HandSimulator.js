@@ -605,6 +605,11 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
       });
       setMulliganCount(0);
       
+      // Update mulligan count in UI if we added one
+      if (additionalMulligan > 0) {
+        setMulliganCount(finalMulliganCount);
+      }
+      
       onClose();
     } catch (error) {
       console.error('Error saving:', error);
