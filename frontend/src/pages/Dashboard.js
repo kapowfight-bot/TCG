@@ -525,11 +525,52 @@ const Dashboard = ({ user, onLogout }) => {
                   </div>
                 )}
 
-                <div className="bg-[#0f0f10] rounded-xl p-4">
-                  <div className="text-sm text-gray-400 line-clamp-3 font-mono">
-                    {deck.deck_list.split('\n').slice(0, 3).join('\n')}
-                  </div>
-                </div>
+                {/* Featured Pokemon Card Image */}
+                {(() => {
+                  // Extract Pokemon name from deck title (e.g., "Charizard EX" -> "Charizard")
+                  const deckNameLower = deck.deck_name.toLowerCase();
+                  let featuredImage = null;
+                  
+                  // Try to find a card in deck's card_data that matches the deck name
+                  if (deck.card_data) {
+                    for (const [cacheKey, cardData] of Object.entries(deck.card_data)) {
+                      if (cardData.isPokemon && cardData.image) {
+                        const cardNameLower = cardData.name.toLowerCase();
+                        // Check if deck name contains this Pokemon's name
+                        if (deckNameLower.includes(cardNameLower.split(' ')[0])) {
+                          featuredImage = cardData.image;
+                          break;
+                        }
+                      }
+                    }
+                    
+                    // Fallback: use first Pokemon card with image
+                    if (!featuredImage) {
+                      for (const [cacheKey, cardData] of Object.entries(deck.card_data)) {
+                        if (cardData.isPokemon && cardData.image) {
+                          featuredImage = cardData.image;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  
+                  return featuredImage ? (
+                    <div className="bg-[#0f0f10] rounded-xl p-4 flex justify-center">
+                      <img 
+                        src={featuredImage} 
+                        alt={deck.deck_name}
+                        className="max-h-[200px] rounded-lg"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-[#0f0f10] rounded-xl p-4">
+                      <div className="text-sm text-gray-400 line-clamp-3 font-mono">
+                        {deck.deck_list.split('\n').slice(0, 3).join('\n')}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-sm text-gray-500">
