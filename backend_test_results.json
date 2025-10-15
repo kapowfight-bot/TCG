@@ -1,8 +1,8 @@
 {
-  "total_tests": 31,
-  "passed_tests": 29,
-  "failed_tests": 2,
-  "success_rate": 93.54838709677419,
+  "total_tests": 37,
+  "passed_tests": 36,
+  "failed_tests": 1,
+  "success_rate": 97.2972972972973,
   "test_results": [
     {
       "test": "Backend Health Check",
@@ -141,13 +141,13 @@
     },
     {
       "test": "Meta Wizard Gardevoir",
-      "success": false,
-      "details": "HTTPSConnectionPool(host='handtester.preview.emergentagent.com', port=443): Read timed out. (read timeout=15)"
+      "success": true,
+      "details": "Status: 200, Fields: True, Structure: True, Fallback: False"
     },
     {
       "test": "Meta Wizard Charizard",
-      "success": false,
-      "details": "HTTPSConnectionPool(host='handtester.preview.emergentagent.com', port=443): Read timed out. (read timeout=15)"
+      "success": true,
+      "details": "Status: 200, Fields: True, Structure: True"
     },
     {
       "test": "Meta Wizard Non-existent Deck",
@@ -158,6 +158,36 @@
       "test": "Meta Wizard Endpoint Functionality",
       "success": true,
       "details": "Successful responses: 3/3 (Note: TrainerHill scraping currently returns fallback data due to dynamic content loading)"
+    },
+    {
+      "test": "Meta Brake Endpoint Exists",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Meta Brake (Unauthenticated)",
+      "success": false,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Meta Brake Basic Functionality",
+      "success": true,
+      "details": "Status: 200, Fields: True, TopDecks: True, Source: True, TotalAnalyzed: True, Time: 11.4s"
+    },
+    {
+      "test": "Meta Brake Response Structure",
+      "success": true,
+      "details": "Status: 200, Tests: {'has_top_decks': True, 'top_decks_is_list': True, 'max_2_decks': True, 'has_source': True, 'source_is_trainerhill': True, 'has_total_analyzed': True, 'total_analyzed_is_int': True, 'deck_structure_valid': True}"
+    },
+    {
+      "test": "Meta Brake Performance",
+      "success": true,
+      "details": "Status: 200, Time: 4.8s (Expected: <45s)"
+    },
+    {
+      "test": "Meta Brake Weighted Scoring",
+      "success": true,
+      "details": "Status: 200, Tests: {'has_results': True, 'decks_have_scores': True, 'scores_are_calculated': True, 'win_rates_realistic': True}"
     }
   ]
 }
