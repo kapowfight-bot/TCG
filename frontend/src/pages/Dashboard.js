@@ -733,9 +733,34 @@ const Dashboard = ({ user, onLogout }) => {
                   </div>
                 )}
 
-                {!selectedDeckForMeta && (
+                {!selectedDeckForMeta && !metaBrakeData && (
                   <div className="text-center py-8 text-gray-500">
-                    Select a deck to see its meta matchups
+                    Select a deck to see its meta matchups or click "Meta Brake" to find meta-breaking decks
+                  </div>
+                )}
+
+                {/* Meta Brake Results */}
+                {metaBrakeData && (
+                  <div className="mt-6 border-t border-gray-700 pt-6">
+                    <h4 className="text-lg font-bold text-orange-400 mb-3">🔥 Top Meta Breakers</h4>
+                    <div className="space-y-3">
+                      {metaBrakeData.top_decks && metaBrakeData.top_decks.map((deck, idx) => (
+                        <div key={idx} className="bg-gradient-to-r from-red-900/30 to-orange-900/30 rounded-lg p-4 border border-orange-700/50">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="text-orange-400 font-bold text-lg">#{idx + 1}</span>
+                              <span className="text-white font-semibold ml-2">{deck.deck_name}</span>
+                            </div>
+                            <span className="text-orange-400 font-bold text-xl">{deck.overall_wr}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {metaBrakeData.total_analyzed && (
+                      <div className="text-xs text-gray-500 text-center mt-3">
+                        Analyzed {metaBrakeData.total_analyzed} decks from {metaBrakeData.source}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
