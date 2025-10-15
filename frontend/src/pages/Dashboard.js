@@ -324,6 +324,26 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+
+  const fetchMetaBrake = async () => {
+    setIsLoadingMetaBrake(true);
+    try {
+      const response = await axios.get(
+        `${API}/meta-brake`,
+        { withCredentials: true }
+      );
+      setMetaBrakeData(response.data);
+      toast.success('Meta Brake analysis complete!');
+    } catch (error) {
+      console.error('Error fetching meta brake data:', error);
+      toast.error('Failed to calculate meta breakers');
+      setMetaBrakeData(null);
+    } finally {
+      setIsLoadingMetaBrake(false);
+    }
+  };
+
+
   const handleLogout = async () => {
     try {
       await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
