@@ -527,23 +527,18 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     }
 
     // Check if current hand has no selected basics
-    let additionalMulligan = 0;
     if (hand.length > 0 && selectedBasics.size === 0) {
-      const confirmed = window.confirm(
-        '⚠️ Are you sure there are NO Basic Pokémon in this hand?\n\n' +
-        'YES (OK) = Add 1 mulligan and save\n' +
-        'NO (Cancel) = Don\'t save, let me select basics'
-      );
-      
-      if (!confirmed) {
-        // User clicked Cancel/NO - don't save, stay on current hand
-        return;
-      }
-      
-      // User clicked OK/YES - confirmed no basics, add 1 mulligan and continue saving
-      additionalMulligan = 1;
+      console.log('No basics selected, showing confirmation dialog');
+      setShowNoBasicsConfirm(true);
+      return;
     }
 
+    // Continue with normal save
+    await performSave(0);
+  };
+
+  // Perform the actual save with optional additional mulligan
+  const performSave = async (additionalMulligan = 0) => {
     setIsSaving(true);
     try {
       // Calculate test metrics with additional mulligan if confirmed
