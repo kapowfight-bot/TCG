@@ -749,7 +749,7 @@ const DeckDetail = ({ user, onLogout }) => {
               </svg>
             </div>
             {isTestResultsExpanded && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
                 <div className="bg-[#0f0f10] rounded-xl p-4">
                   <div className="text-sm text-gray-400 mb-1">Hands Tested</div>
                   <div className="text-2xl font-bold">{deck.test_results.total_hands}</div>
@@ -759,6 +759,13 @@ const DeckDetail = ({ user, onLogout }) => {
                   <div className="text-2xl font-bold text-orange-400">{deck.test_results.mulligan_percentage}%</div>
                   <div className="text-xs text-gray-500 mt-1">
                     {deck.test_results.mulligan_count} mulligans
+                  </div>
+                </div>
+                <div className="bg-[#0f0f10] rounded-xl p-4">
+                  <div className="text-sm text-gray-400 mb-1">Unplayable (UH)</div>
+                  <div className="text-2xl font-bold text-red-400">{deck.test_results.unplayable_percentage || 0}%</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {deck.test_results.unplayable_hands || 0} hands
                   </div>
                 </div>
                 <div className="bg-[#0f0f10] rounded-xl p-4">
