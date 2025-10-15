@@ -21,20 +21,26 @@ load_dotenv(ROOT_DIR / '.env')
 def ensure_playwright_browsers():
     """Ensure Playwright browsers are installed, install if missing"""
     try:
-        # Check if chromium browser exists
-        from playwright.sync_api import sync_playwright
-        with sync_playwright() as p:
-            try:
-                # Try to get browser executable path
-                browser_type = p.chromium
-                executable_path = browser_type.executable_path
-                logging.info(f"Playwright Chromium found at: {executable_path}")
-            except Exception as e:
-                logging.warning(f"Playwright browsers not found: {e}")
-                logging.info("Installing Playwright browsers...")
-                # Install browsers
-                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+        # Simple check: try to find chromium executable
+        playwright_browsers_path = Path("/pw-browsers/chromium-1187")
+        
+        if not playwright_browsers_path.exists():
+            logging.warning("Playwright browsers not found, attempting installation...")
+            logging.info("Installing Playwright Chromium browser...")
+            # Install browsers
+            result = subprocess.run(
+                [sys.executable, "-m", "playwright", "install", "chromium"],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            if result.returncode == 0:
                 logging.info("Playwright browsers installed successfully")
+            else:
+                logging.error(f"Playwright installation failed: {result.stderr}")
+                logging.warning("Meta Wizard and Meta Brake features may not work correctly")
+        else:
+            logging.info(f"Playwright Chromium browser found at: {playwright_browsers_path}")
     except Exception as e:
         logging.error(f"Failed to ensure Playwright browsers: {e}")
         logging.warning("Meta Wizard and Meta Brake features may not work correctly")
