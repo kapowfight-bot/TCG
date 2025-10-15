@@ -302,6 +302,26 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+  const fetchMetaWizard = async (deckName) => {
+    if (!deckName) return;
+    
+    setIsLoadingMeta(true);
+    try {
+      const response = await axios.get(
+        `${API}/meta-wizard/${encodeURIComponent(deckName)}`,
+        { withCredentials: true }
+      );
+      setMetaData(response.data);
+      toast.success('Meta data loaded!');
+    } catch (error) {
+      console.error('Error fetching meta data:', error);
+      toast.error('Failed to fetch meta data from TrainerHill');
+      setMetaData(null);
+    } finally {
+      setIsLoadingMeta(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
