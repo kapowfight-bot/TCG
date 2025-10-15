@@ -17,36 +17,33 @@ import sys
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Check and install Playwright browsers if needed
-def ensure_playwright_browsers():
-    """Ensure Playwright browsers are installed, install if missing"""
-    try:
-        # Simple check: try to find chromium executable
-        playwright_browsers_path = Path("/pw-browsers/chromium-1187")
-        
-        if not playwright_browsers_path.exists():
-            logging.warning("Playwright browsers not found, attempting installation...")
-            logging.info("Installing Playwright Chromium browser...")
-            # Install browsers
-            result = subprocess.run(
-                [sys.executable, "-m", "playwright", "install", "chromium"],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            if result.returncode == 0:
-                logging.info("Playwright browsers installed successfully")
-            else:
-                logging.error(f"Playwright installation failed: {result.stderr}")
-                logging.warning("Meta Wizard and Meta Brake features may not work correctly")
+# Check and install Playwright browsers if needed (runs at startup)
+try:
+    # Check if chromium executable exists
+    chromium_paths = [
+        Path("/pw-browsers/chromium-1187/chrome-linux/chrome"),
+        Path("/pw-browsers/chromium-1187/chrome-linux/headless_shell"),
+        Path("/usr/local/share/playwright/chromium-1187/chrome-linux/headless_shell")
+    ]
+    
+    browser_found = any(path.exists() for path in chromium_paths)
+    
+    if not browser_found:
+        logging.warning("Playwright Chromium browser not found, attempting installation...")
+        result = subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium"],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        if result.returncode == 0:
+            logging.info("✅ Playwright Chromium browser installed successfully")
         else:
-            logging.info(f"Playwright Chromium browser found at: {playwright_browsers_path}")
-    except Exception as e:
-        logging.error(f"Failed to ensure Playwright browsers: {e}")
-        logging.warning("Meta Wizard and Meta Brake features may not work correctly")
-
-# Install Playwright browsers on startup
-ensure_playwright_browsers()
+            logging.error(f"❌ Playwright installation failed: {result.stderr}")
+    else:
+        logging.info("✅ Playwright Chromium browser found and ready")
+except Exception as e:
+    logging.error(f"❌ Failed to check Playwright browsers: {e}")
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
