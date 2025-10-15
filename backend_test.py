@@ -501,6 +501,215 @@ class PokemonTCGTrackerTester:
             self.log_test("Meta Wizard Endpoint Functionality", False, str(e))
             return False
 
+    def test_meta_brake_endpoint_exists(self):
+        """Test Meta Brake endpoint exists"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-brake", timeout=45)
+            # Endpoint should exist but may require auth or return data
+            success = response.status_code in [200, 401, 500]  # Any response except 404 means endpoint exists
+            self.log_test("Meta Brake Endpoint Exists", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Meta Brake Endpoint Exists", False, str(e))
+            return False
+
+    def test_meta_brake_without_auth(self):
+        """Test Meta Brake endpoint without authentication"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-brake", timeout=45)
+            success = response.status_code == 401
+            self.log_test("Meta Brake (Unauthenticated)", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Meta Brake (Unauthenticated)", False, str(e))
+            return False
+
+    def test_meta_brake_basic_functionality(self):
+        """Test Meta Brake basic functionality - NOTE: This test will fail without proper auth"""
+        try:
+            import time
+            start_time = time.time()
+            
+            response = requests.get(f"{self.api_url}/meta-brake", timeout=45)
+            
+            end_time = time.time()
+            response_time = end_time - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify response structure
+                required_fields = ['top_decks', 'source', 'total_analyzed']
+                has_all_fields = all(field in data for field in required_fields)
+                
+                # Verify top_decks structure
+                top_decks_valid = False
+                if isinstance(data.get('top_decks'), list):
+                    if len(data['top_decks']) <= 2:  # Should return max 2 decks
+                        top_decks_valid = True
+                        # Check each deck has required fields
+                        for deck in data['top_decks']:
+                            if not all(field in deck for field in ['deck_name', 'overall_wr', 'weighted_score']):
+                                top_decks_valid = False
+                                break
+                
+                # Verify source
+                source_valid = data.get('source') == 'TrainerHill'
+                
+                # Verify total_analyzed is a number
+                total_analyzed_valid = isinstance(data.get('total_analyzed'), int) and data.get('total_analyzed') >= 0
+                
+                # Verify response time (should be < 45 seconds)
+                time_valid = response_time < 45
+                
+                success = has_all_fields and top_decks_valid and source_valid and total_analyzed_valid and time_valid
+                details = f"Status: {response.status_code}, Fields: {has_all_fields}, TopDecks: {top_decks_valid}, Source: {source_valid}, TotalAnalyzed: {total_analyzed_valid}, Time: {response_time:.1f}s"
+                
+            elif response.status_code == 401:
+                success = False  # Expected to fail without auth, but we note it
+                details = f"Status: {response.status_code} - Authentication required (expected)"
+            else:
+                success = False
+                details = f"Status: {response.status_code}"
+                
+            self.log_test("Meta Brake Basic Functionality", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Brake Basic Functionality", False, str(e))
+            return False
+
+    def test_meta_brake_response_structure(self):
+        """Test Meta Brake response structure validation"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-brake", timeout=45)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Test response structure in detail
+                structure_tests = {
+                    'has_top_decks': 'top_decks' in data,
+                    'top_decks_is_list': isinstance(data.get('top_decks'), list),
+                    'max_2_decks': len(data.get('top_decks', [])) <= 2,
+                    'has_source': 'source' in data,
+                    'source_is_trainerhill': data.get('source') == 'TrainerHill',
+                    'has_total_analyzed': 'total_analyzed' in data,
+                    'total_analyzed_is_int': isinstance(data.get('total_analyzed'), int)
+                }
+                
+                # Check individual deck structure
+                deck_structure_valid = True
+                if data.get('top_decks'):
+                    for i, deck in enumerate(data['top_decks']):
+                        required_deck_fields = ['deck_name', 'overall_wr', 'weighted_score']
+                        for field in required_deck_fields:
+                            if field not in deck:
+                                deck_structure_valid = False
+                                break
+                        
+                        # Validate data types and ranges
+                        if deck_structure_valid:
+                            if not isinstance(deck.get('deck_name'), str) or not deck.get('deck_name').strip():
+                                deck_structure_valid = False
+                            elif not isinstance(deck.get('overall_wr'), (int, float)) or not (0 <= deck.get('overall_wr') <= 100):
+                                deck_structure_valid = False
+                            elif not isinstance(deck.get('weighted_score'), (int, float)):
+                                deck_structure_valid = False
+                
+                structure_tests['deck_structure_valid'] = deck_structure_valid
+                
+                success = all(structure_tests.values())
+                details = f"Status: {response.status_code}, Tests: {structure_tests}"
+                
+            elif response.status_code == 401:
+                success = False
+                details = f"Status: {response.status_code} - Authentication required"
+            else:
+                success = False
+                details = f"Status: {response.status_code}"
+                
+            self.log_test("Meta Brake Response Structure", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Brake Response Structure", False, str(e))
+            return False
+
+    def test_meta_brake_performance(self):
+        """Test Meta Brake performance (should complete within 45 seconds)"""
+        try:
+            import time
+            start_time = time.time()
+            
+            response = requests.get(f"{self.api_url}/meta-brake", timeout=45)
+            
+            end_time = time.time()
+            response_time = end_time - start_time
+            
+            # Performance test - should complete within 45 seconds
+            time_acceptable = response_time < 45
+            
+            if response.status_code == 200:
+                success = time_acceptable
+                details = f"Status: {response.status_code}, Time: {response_time:.1f}s (Expected: <45s)"
+            elif response.status_code == 401:
+                success = time_acceptable  # Still test performance even if auth fails
+                details = f"Status: {response.status_code}, Time: {response_time:.1f}s - Auth required but performance OK"
+            else:
+                success = False
+                details = f"Status: {response.status_code}, Time: {response_time:.1f}s"
+                
+            self.log_test("Meta Brake Performance", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Brake Performance", False, str(e))
+            return False
+
+    def test_meta_brake_weighted_scoring_logic(self):
+        """Test Meta Brake weighted scoring algorithm validation"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-brake", timeout=45)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                scoring_tests = {
+                    'has_results': len(data.get('top_decks', [])) > 0,
+                    'decks_have_scores': True,
+                    'scores_are_calculated': True,
+                    'win_rates_realistic': True
+                }
+                
+                if data.get('top_decks'):
+                    for deck in data['top_decks']:
+                        # Check that weighted_score exists and is different from overall_wr
+                        if 'weighted_score' not in deck or 'overall_wr' not in deck:
+                            scoring_tests['decks_have_scores'] = False
+                        
+                        # Weighted score should be calculated (not just overall win rate)
+                        if deck.get('weighted_score') == deck.get('overall_wr'):
+                            scoring_tests['scores_are_calculated'] = False
+                        
+                        # Win rates should be realistic (0-100 range, likely 50%+ for top decks)
+                        overall_wr = deck.get('overall_wr', 0)
+                        if not (0 <= overall_wr <= 100):
+                            scoring_tests['win_rates_realistic'] = False
+                
+                success = all(scoring_tests.values())
+                details = f"Status: {response.status_code}, Tests: {scoring_tests}"
+                
+            elif response.status_code == 401:
+                success = False
+                details = f"Status: {response.status_code} - Authentication required"
+            else:
+                success = False
+                details = f"Status: {response.status_code}"
+                
+            self.log_test("Meta Brake Weighted Scoring", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Brake Weighted Scoring", False, str(e))
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Pokemon TCG Tracker Backend Tests")
