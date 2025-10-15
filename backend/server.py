@@ -703,6 +703,7 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
         old_total_trainer = (existing_results.get("avg_trainer", 0) if existing_results else 0) * old_total_hands
         old_total_energy = (existing_results.get("avg_energy", 0) if existing_results else 0) * old_total_hands
         old_total_basic_pokemon = (existing_results.get("avg_basic_pokemon", 0) if existing_results else 0) * old_total_hands
+        old_unplayable_hands = existing_results.get("unplayable_hands", 0) if existing_results else 0
         
         # Add new test results to existing
         new_total_hands = old_total_hands + test_results.total_hands
@@ -711,13 +712,15 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
         new_total_trainer = old_total_trainer + (test_results.avg_trainer * test_results.total_hands)
         new_total_energy = old_total_energy + (test_results.avg_energy * test_results.total_hands)
         new_total_basic_pokemon = old_total_basic_pokemon + (test_results.avg_basic_pokemon * test_results.total_hands)
+        new_unplayable_hands = old_unplayable_hands + test_results.unplayable_hands
         
-        # Calculate new averages
+        # Calculate new averages and percentages
         new_mulligan_percentage = (new_mulligan_count / new_total_hands * 100) if new_total_hands > 0 else 0
         new_avg_pokemon = new_total_pokemon / new_total_hands if new_total_hands > 0 else 0
         new_avg_trainer = new_total_trainer / new_total_hands if new_total_hands > 0 else 0
         new_avg_energy = new_total_energy / new_total_hands if new_total_hands > 0 else 0
         new_avg_basic_pokemon = new_total_basic_pokemon / new_total_hands if new_total_hands > 0 else 0
+        new_unplayable_percentage = (new_unplayable_hands / new_total_hands * 100) if new_total_hands > 0 else 0
         
         # Update deck with accumulated test results
         await db.decks.update_one(
