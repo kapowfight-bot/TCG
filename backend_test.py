@@ -360,6 +360,166 @@ class PokemonTCGTrackerTester:
             self.log_test("Edit Deck (Non-existent)", False, str(e))
             return False
 
+    def test_meta_wizard_endpoint_exists(self):
+        """Test Meta Wizard endpoint exists"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-wizard/Gardevoir", timeout=15)
+            # Endpoint should exist but may require auth or return data
+            success = response.status_code in [200, 401, 500]  # Any response except 404 means endpoint exists
+            self.log_test("Meta Wizard Endpoint Exists", success, f"Status: {response.status_code}")
+            return success
+        except Exception as e:
+            self.log_test("Meta Wizard Endpoint Exists", False, str(e))
+            return False
+
+    def test_meta_wizard_gardevoir(self):
+        """Test Meta Wizard with Gardevoir deck"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-wizard/Gardevoir", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Verify response structure
+                required_fields = ['deck_name', 'best_matchups', 'worst_matchups', 'source', 'total_matchups']
+                has_all_fields = all(field in data for field in required_fields)
+                
+                # Verify data types and structure
+                valid_structure = (
+                    isinstance(data.get('deck_name'), str) and
+                    isinstance(data.get('best_matchups'), list) and
+                    isinstance(data.get('worst_matchups'), list) and
+                    isinstance(data.get('source'), str) and
+                    isinstance(data.get('total_matchups'), int)
+                )
+                
+                # Verify matchup data structure
+                valid_matchups = True
+                for matchup in data.get('best_matchups', []):
+                    if not (isinstance(matchup.get('opponent'), str) and 
+                           isinstance(matchup.get('win_rate'), (int, float))):
+                        valid_matchups = False
+                        break
+                
+                for matchup in data.get('worst_matchups', []):
+                    if not (isinstance(matchup.get('opponent'), str) and 
+                           isinstance(matchup.get('win_rate'), (int, float))):
+                        valid_matchups = False
+                        break
+                
+                success = has_all_fields and valid_structure and valid_matchups
+                details = f"Status: {response.status_code}, Fields: {has_all_fields}, Structure: {valid_structure}, Matchups: {valid_matchups}"
+                
+                if success:
+                    # Verify best matchups are sorted highest to lowest
+                    best_rates = [m['win_rate'] for m in data.get('best_matchups', [])]
+                    best_sorted = best_rates == sorted(best_rates, reverse=True)
+                    
+                    # Verify worst matchups are sorted lowest to highest  
+                    worst_rates = [m['win_rate'] for m in data.get('worst_matchups', [])]
+                    worst_sorted = worst_rates == sorted(worst_rates)
+                    
+                    success = best_sorted and worst_sorted
+                    details += f", Best sorted: {best_sorted}, Worst sorted: {worst_sorted}"
+                    
+            else:
+                success = False
+                details = f"Status: {response.status_code}"
+                
+            self.log_test("Meta Wizard Gardevoir", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Wizard Gardevoir", False, str(e))
+            return False
+
+    def test_meta_wizard_charizard(self):
+        """Test Meta Wizard with Charizard deck"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-wizard/Charizard", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Verify response structure (same as Gardevoir test)
+                required_fields = ['deck_name', 'best_matchups', 'worst_matchups', 'source', 'total_matchups']
+                has_all_fields = all(field in data for field in required_fields)
+                
+                valid_structure = (
+                    isinstance(data.get('deck_name'), str) and
+                    isinstance(data.get('best_matchups'), list) and
+                    isinstance(data.get('worst_matchups'), list) and
+                    isinstance(data.get('source'), str) and
+                    data.get('source') == 'TrainerHill'
+                )
+                
+                success = has_all_fields and valid_structure
+                details = f"Status: {response.status_code}, Fields: {has_all_fields}, Structure: {valid_structure}"
+            else:
+                success = False
+                details = f"Status: {response.status_code}"
+                
+            self.log_test("Meta Wizard Charizard", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Wizard Charizard", False, str(e))
+            return False
+
+    def test_meta_wizard_nonexistent_deck(self):
+        """Test Meta Wizard with non-existent deck"""
+        try:
+            response = requests.get(f"{self.api_url}/meta-wizard/NonExistentDeck123", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Should return fallback message for non-existent deck
+                required_fields = ['deck_name', 'best_matchups', 'worst_matchups', 'source']
+                has_all_fields = all(field in data for field in required_fields)
+                
+                # Check if it's a fallback response
+                is_fallback = (
+                    'not found' in str(data.get('best_matchups', [])).lower() or
+                    'not found' in str(data.get('note', '')).lower() or
+                    data.get('total_matchups', 0) == 0
+                )
+                
+                success = has_all_fields and is_fallback
+                details = f"Status: {response.status_code}, Fields: {has_all_fields}, Fallback: {is_fallback}"
+            else:
+                success = False
+                details = f"Status: {response.status_code}"
+                
+            self.log_test("Meta Wizard Non-existent Deck", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Wizard Non-existent Deck", False, str(e))
+            return False
+
+    def test_meta_wizard_scraping_functionality(self):
+        """Test Meta Wizard scraping functionality with real deck names"""
+        try:
+            # Test with multiple deck names to verify scraping works
+            test_decks = ["Gardevoir", "Charizard", "Pikachu"]
+            successful_scrapes = 0
+            
+            for deck_name in test_decks:
+                try:
+                    response = requests.get(f"{self.api_url}/meta-wizard/{deck_name}", timeout=15)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if (data.get('source') == 'TrainerHill' and 
+                            isinstance(data.get('total_matchups'), int)):
+                            successful_scrapes += 1
+                except:
+                    continue
+            
+            # At least one deck should return valid data
+            success = successful_scrapes > 0
+            details = f"Successful scrapes: {successful_scrapes}/{len(test_decks)}"
+            
+            self.log_test("Meta Wizard Scraping Functionality", success, details)
+            return success
+        except Exception as e:
+            self.log_test("Meta Wizard Scraping Functionality", False, str(e))
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Pokemon TCG Tracker Backend Tests")
