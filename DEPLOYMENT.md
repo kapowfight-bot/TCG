@@ -1,31 +1,40 @@
 # Deployment Instructions
 
-## Playwright Browser Installation
+## ⚠️ CRITICAL: Playwright Browser Installation Required
 
-This application uses Playwright for web scraping (Meta Wizard and Meta Brake features). Playwright requires browser binaries to be installed.
+This application uses Playwright for web scraping (Meta Wizard and Meta Brake features). **Playwright browsers MUST be installed in production** or these features will fail.
 
-### Automatic Installation
+### 🚨 Important Notes
 
-The backend (`server.py`) now includes automatic browser installation on startup. If Playwright browsers are not detected, they will be installed automatically.
+- Playwright Python package is installed via `requirements.txt`
+- **Browser binaries are NOT installed automatically** during deployment
+- You MUST manually install browsers after deploying to production
 
-### Manual Installation (if needed)
+### Installation Methods
 
-If automatic installation fails, you can manually install browsers:
+#### Method 1: Run Post-Deploy Script (Recommended)
+
+A `postdeploy.sh` script is included at the project root:
 
 ```bash
-# In the backend directory
+bash /app/postdeploy.sh
+```
+
+**To configure in Emergent:**
+1. After deploying, access your production environment shell/terminal
+2. Run: `cd /app && bash postdeploy.sh`
+3. Restart backend service
+
+#### Method 2: Manual Installation
+
+SSH or access production environment terminal:
+
+```bash
 cd /app/backend
 playwright install chromium
 ```
 
-### Post-Deploy Script
-
-A `postdeploy.sh` script is included at the project root that can be configured to run after deployment:
-
-```bash
-#!/bin/bash
-playwright install chromium
-```
+Then restart the backend service.
 
 ### Emergent Platform Configuration
 
