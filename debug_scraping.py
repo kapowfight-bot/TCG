@@ -73,6 +73,14 @@ async def debug_trainerhill_scraping():
         if percentages:
             print(f"Sample percentages: {percentages[:10]}")
         
+        # Print a sample of the HTML to see what's actually there
+        print("\n=== HTML SAMPLE ===")
+        print("First 1000 characters:")
+        print(html[:1000])
+        print("\n...")
+        print("Last 500 characters:")
+        print(html[-500:])
+        
     except Exception as e:
         print(f"Error during scraping debug: {str(e)}")
 
