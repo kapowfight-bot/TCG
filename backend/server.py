@@ -845,6 +845,7 @@ async def get_meta_wizard(deck_name: str):
                 'best_matchups': [{'opponent': 'Deck not found in meta', 'win_rate': 0}],
                 'worst_matchups': [{'opponent': 'Deck not found in meta', 'win_rate': 0}],
                 'source': 'TrainerHill',
+                'total_matchups': 0,
                 'note': f'Deck "{deck_name}" not found in current meta data.'
             }
         
