@@ -18,6 +18,9 @@ const Dashboard = ({ user, onLogout }) => {
   const [deckName, setDeckName] = useState('');
   const [deckList, setDeckList] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedDeckForMeta, setSelectedDeckForMeta] = useState(null);
+  const [metaData, setMetaData] = useState(null);
+  const [isLoadingMeta, setIsLoadingMeta] = useState(false);
 
   useEffect(() => {
     fetchDecks();
