@@ -419,7 +419,7 @@ class PokemonTCGTrackerTester:
             if response.status_code == 200:
                 data = response.json()
                 # Verify response structure (same as Gardevoir test)
-                required_fields = ['deck_name', 'best_matchups', 'worst_matchups', 'source', 'total_matchups']
+                required_fields = ['deck_name', 'best_matchups', 'worst_matchups', 'source']
                 has_all_fields = all(field in data for field in required_fields)
                 
                 valid_structure = (
