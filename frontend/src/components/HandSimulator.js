@@ -981,6 +981,45 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
           </div>
         )}
       </DialogContent>
+
+      {/* No Basics Confirmation Dialog */}
+      <Dialog open={showNoBasicsConfirm} onOpenChange={setShowNoBasicsConfirm}>
+        <DialogContent className="bg-[#1a1a1b] border-gray-800 text-white sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">⚠️ No Basic Pokémon Selected</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-300 mb-4">
+              Are you sure there are <strong>NO Basic Pokémon</strong> in this hand?
+            </p>
+            <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-3 text-sm text-yellow-200 mb-4">
+              Clicking "Yes" will add 1 mulligan to your count and save the results.
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                setShowNoBasicsConfirm(false);
+                // Don't save, let user select basics
+              }}
+              variant="outline"
+              className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800"
+            >
+              No, Let Me Select
+            </Button>
+            <Button
+              onClick={async () => {
+                setShowNoBasicsConfirm(false);
+                // Add 1 mulligan and save
+                await performSave(1);
+              }}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+            >
+              Yes, Save with Mulligan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
