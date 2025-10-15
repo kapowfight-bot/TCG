@@ -11,9 +11,36 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone, timedelta
 import httpx
+import subprocess
+import sys
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Check and install Playwright browsers if needed
+def ensure_playwright_browsers():
+    """Ensure Playwright browsers are installed, install if missing"""
+    try:
+        # Check if chromium browser exists
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            try:
+                # Try to get browser executable path
+                browser_type = p.chromium
+                executable_path = browser_type.executable_path
+                logging.info(f"Playwright Chromium found at: {executable_path}")
+            except Exception as e:
+                logging.warning(f"Playwright browsers not found: {e}")
+                logging.info("Installing Playwright browsers...")
+                # Install browsers
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                logging.info("Playwright browsers installed successfully")
+    except Exception as e:
+        logging.error(f"Failed to ensure Playwright browsers: {e}")
+        logging.warning("Meta Wizard and Meta Brake features may not work correctly")
+
+# Install Playwright browsers on startup
+ensure_playwright_browsers()
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
