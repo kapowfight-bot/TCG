@@ -760,6 +760,14 @@ class PokemonTCGTrackerTester:
         self.test_meta_wizard_nonexistent_deck()
         self.test_meta_wizard_scraping_functionality()
         
+        # Test Meta Brake feature
+        self.test_meta_brake_endpoint_exists()
+        self.test_meta_brake_without_auth()
+        self.test_meta_brake_basic_functionality()
+        self.test_meta_brake_response_structure()
+        self.test_meta_brake_performance()
+        self.test_meta_brake_weighted_scoring_logic()
+        
         # Print summary
         print("\n" + "=" * 50)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
