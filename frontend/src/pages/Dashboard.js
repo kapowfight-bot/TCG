@@ -492,9 +492,12 @@ const Dashboard = ({ user, onLogout }) => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {decks.map((deck) => (
-              <div
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Deck List - 2 columns */}
+            <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {decks.map((deck) => (
+                  <div
                 key={deck.id}
                 data-testid={`deck-card-${deck.id}`}
                 onClick={() => navigate(`/deck/${deck.id}`)}
