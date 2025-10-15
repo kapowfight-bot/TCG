@@ -758,56 +758,79 @@ async def get_meta_wizard(deck_name: str):
             html = response.text
             
         # Parse HTML to find matchup data
-        # TrainerHill uses tables with deck matchups
         import re
         from bs4 import BeautifulSoup
         
         soup = BeautifulSoup(html, 'html.parser')
         
-        # Normalize deck name for matching (remove "EX", spaces, etc.)
+        # Normalize deck name for matching
         search_name = deck_name.lower().replace(' ex', '').replace('ex', '').strip()
         
-        # Find the deck row in the meta table
         matchups = []
         
-        # Look for tables with matchup data
+        # Find the matchup table
         tables = soup.find_all('table')
         
         for table in tables:
             rows = table.find_all('tr')
-            for row in rows:
+            if len(rows) < 2:
+                continue
+            
+            # Get header row to identify columns (opponent decks)
+            header_row = rows[0]
+            header_cells = header_row.find_all(['th', 'td'])
+            
+            # Extract opponent names from headers (skip first column which is the deck name)
+            opponent_names = []
+            for cell in header_cells[1:]:
+                opponent_text = cell.get_text(strip=True)
+                # Clean up the text
+                opponent_clean = re.sub(r'\s+', ' ', opponent_text).strip()
+                if opponent_clean and opponent_clean != '%=wins+ties3total':
+                    opponent_names.append(opponent_clean)
+            
+            # Find our deck's row
+            for row in rows[1:]:
                 cells = row.find_all(['td', 'th'])
-                if len(cells) > 0:
-                    # Check if this row contains our deck
-                    first_cell_text = cells[0].get_text().lower().strip()
-                    if search_name in first_cell_text or first_cell_text in search_name:
-                        # Found our deck, parse matchup data
-                        # Extract matchup percentages from remaining cells
-                        for i, cell in enumerate(cells[1:], 1):
-                            cell_text = cell.get_text().strip()
-                            # Look for percentage patterns (e.g., "65%", "45.5%")
-                            percentage_match = re.search(r'(\d+(?:\.\d+)?)\s*%', cell_text)
-                            if percentage_match:
-                                win_rate = float(percentage_match.group(1))
-                                # Get opponent name from header or context
-                                matchups.append({
-                                    'opponent': f'Matchup {i}',
-                                    'win_rate': win_rate
-                                })
+                if len(cells) < 2:
+                    continue
+                
+                # First cell is the deck name
+                first_cell_text = cells[0].get_text(strip=True).lower()
+                
+                # Check if this is our deck
+                if search_name in first_cell_text or first_cell_text.replace(' ', '') in search_name.replace(' ', ''):
+                    logger.info(f"Found deck row for {deck_name}: {first_cell_text}")
+                    
+                    # Parse matchup data from remaining cells
+                    for i, cell in enumerate(cells[1:]):
+                        cell_text = cell.get_text(strip=True)
+                        # Extract percentage (e.g., "65.2%")
+                        percentage_match = re.search(r'(\d+(?:\.\d+)?)\s*%', cell_text)
+                        
+                        if percentage_match and i < len(opponent_names):
+                            win_rate = float(percentage_match.group(1))
+                            opponent = opponent_names[i]
+                            
+                            matchups.append({
+                                'opponent': opponent,
+                                'win_rate': win_rate
+                            })
+                    
+                    break  # Found our deck, stop searching
+            
+            if matchups:
+                break  # Found matchups, stop searching tables
         
-        # If no structured data found, return mock data for now
+        # If no matchups found
         if not matchups:
-            logger.warning(f"No matchup data found for {deck_name} on TrainerHill")
+            logger.warning(f"No matchup data found for {deck_name}")
             return {
                 'deck_name': deck_name,
-                'best_matchups': [
-                    {'opponent': 'Data not available', 'win_rate': 0}
-                ],
-                'worst_matchups': [
-                    {'opponent': 'Data not available', 'win_rate': 0}
-                ],
+                'best_matchups': [{'opponent': 'Deck not found in meta', 'win_rate': 0}],
+                'worst_matchups': [{'opponent': 'Deck not found in meta', 'win_rate': 0}],
                 'source': 'TrainerHill',
-                'note': 'Unable to parse matchup data. Deck may not be in current meta.'
+                'note': f'Deck "{deck_name}" not found in current meta data.'
             }
         
         # Sort matchups by win rate
