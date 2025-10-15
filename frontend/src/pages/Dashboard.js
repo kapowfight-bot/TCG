@@ -310,14 +310,14 @@ const Dashboard = ({ user, onLogout }) => {
     setIsLoadingMeta(true);
     try {
       const response = await axios.get(
-        `${API}/meta-wizard/${encodeURIComponent(deckName)}`,
-        { withCredentials: true }
+        `${API}/meta-wizard/${encodeURIComponent(deckName)}`
       );
       setMetaData(response.data);
       toast.success('Meta data loaded!');
     } catch (error) {
       console.error('Error fetching meta data:', error);
-      toast.error('Failed to fetch meta data from TrainerHill');
+      console.error('Full error details:', error.response?.data || error.message);
+      toast.error(`Failed to fetch meta data: ${error.response?.data?.detail || error.message}`);
       setMetaData(null);
     } finally {
       setIsLoadingMeta(false);
