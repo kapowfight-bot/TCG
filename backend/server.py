@@ -734,6 +734,8 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
                     "avg_trainer": round(new_avg_trainer, 1),
                     "avg_energy": round(new_avg_energy, 1),
                     "avg_basic_pokemon": round(new_avg_basic_pokemon, 1),
+                    "unplayable_hands": new_unplayable_hands,
+                    "unplayable_percentage": round(new_unplayable_percentage, 1),
                     "last_tested": datetime.now(timezone.utc).isoformat()
                 }
             }}
