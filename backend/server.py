@@ -869,6 +869,163 @@ async def get_meta_wizard(deck_name: str):
         logger.error(f"Error fetching meta data from TrainerHill: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch meta data: {str(e)}")
 
+
+@api_router.get("/meta-brake")
+async def get_meta_brake():
+    """Calculate top 2 meta-breaking decks using weighted scoring"""
+    try:
+        from playwright.async_api import async_playwright
+        import re
+        from bs4 import BeautifulSoup
+        
+        logger.info("Starting Meta Brake calculation...")
+        
+        # Use Playwright to render JavaScript content
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            
+            try:
+                # Navigate to TrainerHill meta page
+                await page.goto("https://www.trainerhill.com/meta?game=PTCG", wait_until="networkidle", timeout=30000)
+                
+                # Wait for the table to load
+                await page.wait_for_selector("table", timeout=15000)
+                
+                # Get the rendered HTML
+                html = await page.content()
+                
+            finally:
+                await browser.close()
+        
+        # Parse HTML to extract full matchup matrix
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # Find the matchup table
+        tables = soup.find_all('table')
+        
+        deck_data = {}  # {deck_name: {overall_wr: float, matchups: {opponent: win_rate}}}
+        
+        for table in tables:
+            rows = table.find_all('tr')
+            if len(rows) < 2:
+                continue
+            
+            # Get header row for opponent names
+            header_row = rows[0]
+            header_cells = header_row.find_all(['th', 'td'])
+            
+            # Extract opponent names (skip first column)
+            opponent_names = []
+            for cell in header_cells[1:]:
+                opponent_text = cell.get_text(strip=True)
+                opponent_clean = re.sub(r'\s+', ' ', opponent_text).strip()
+                if opponent_clean and opponent_clean != '%=wins+ties3total':
+                    opponent_names.append(opponent_clean)
+            
+            if len(opponent_names) == 0:
+                continue
+            
+            logger.info(f"Found {len(opponent_names)} decks in meta")
+            
+            # Parse each deck's row
+            for row in rows[1:]:
+                cells = row.find_all(['td', 'th'])
+                if len(cells) < 2:
+                    continue
+                
+                # First cell is the deck name
+                deck_name = cells[0].get_text(strip=True)
+                if not deck_name:
+                    continue
+                
+                # Parse matchup data
+                matchups = {}
+                win_rates = []
+                
+                for i, cell in enumerate(cells[1:]):
+                    cell_text = cell.get_text(strip=True)
+                    # Extract percentage
+                    percentage_match = re.search(r'(\d+(?:\.\d+)?)\s*%', cell_text)
+                    
+                    if percentage_match and i < len(opponent_names):
+                        win_rate = float(percentage_match.group(1))
+                        opponent = opponent_names[i]
+                        matchups[opponent] = win_rate
+                        win_rates.append(win_rate)
+                
+                if len(matchups) > 0:
+                    # Calculate overall win rate for this deck
+                    overall_wr = sum(win_rates) / len(win_rates)
+                    deck_data[deck_name] = {
+                        'overall_wr': overall_wr,
+                        'matchups': matchups
+                    }
+            
+            if len(deck_data) > 0:
+                break  # Found data, stop searching
+        
+        if len(deck_data) < 2:
+            logger.warning("Not enough deck data found")
+            return {
+                'top_decks': [],
+                'note': 'Insufficient data to calculate meta breakers'
+            }
+        
+        logger.info(f"Analyzing {len(deck_data)} decks for meta breakers...")
+        
+        # Calculate weighted scores
+        # Score = overall_wr * 0.4 + weighted_matchup_score * 0.6
+        # weighted_matchup_score = Σ(win_rate_vs_opponent * opponent_overall_wr) / Σ(opponent_overall_wr)
+        
+        deck_scores = []
+        
+        for deck_name, data in deck_data.items():
+            overall_wr = data['overall_wr']
+            matchups = data['matchups']
+            
+            # Calculate weighted matchup score
+            weighted_sum = 0
+            weight_total = 0
+            
+            for opponent, win_rate_vs_opponent in matchups.items():
+                if opponent in deck_data:
+                    opponent_strength = deck_data[opponent]['overall_wr']
+                    # Weight this matchup by opponent's strength
+                    weighted_sum += (win_rate_vs_opponent / 100.0) * opponent_strength
+                    weight_total += opponent_strength
+            
+            if weight_total > 0:
+                weighted_matchup_score = (weighted_sum / weight_total) * 100
+            else:
+                weighted_matchup_score = overall_wr
+            
+            # Final score: balance overall strength with ability to beat strong decks
+            final_score = (overall_wr * 0.4) + (weighted_matchup_score * 0.6)
+            
+            deck_scores.append({
+                'deck_name': deck_name,
+                'overall_wr': round(overall_wr, 1),
+                'weighted_score': round(final_score, 2)
+            })
+        
+        # Sort by weighted score and get top 2
+        deck_scores.sort(key=lambda x: x['weighted_score'], reverse=True)
+        top_2 = deck_scores[:2]
+        
+        logger.info(f"Top 2 meta breakers: {[d['deck_name'] for d in top_2]}")
+        
+        return {
+            'top_decks': top_2,
+            'source': 'TrainerHill',
+            'total_analyzed': len(deck_data)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error calculating meta breakers: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to calculate meta breakers: {str(e)}")
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
