@@ -582,7 +582,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
           avg_pokemon: parseFloat(avgPokemon),
           avg_trainer: parseFloat(avgTrainer),
           avg_energy: parseFloat(avgEnergy),
-          avg_basic_pokemon: parseFloat(avgBasicPokemon)
+          avg_basic_pokemon: parseFloat(avgBasicPokemon),
+          unplayable_hands: testStats.unplayableHands
         },
         { withCredentials: true }
       );
