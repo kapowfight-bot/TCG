@@ -603,9 +603,11 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         totalTrainer: 0,
         totalEnergy: 0,
         totalCards: 0,
-        totalBasicPokemon: 0
+        totalBasicPokemon: 0,
+        unplayableHands: 0
       });
       setMulliganCount(0);
+      setIsUnplayable(false);
       
       onClose();
     } catch (error) {
