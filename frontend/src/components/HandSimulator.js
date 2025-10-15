@@ -22,8 +22,11 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     totalTrainer: 0,
     totalEnergy: 0,
     totalCards: 0,
-    totalBasicPokemon: 0
+    totalBasicPokemon: 0,
+    unplayableHands: 0
   });
+  
+  const [isUnplayable, setIsUnplayable] = useState(false);
 
   // Fetch card data for the deck
   const fetchCardDataForDeck = async (deckListText) => {
