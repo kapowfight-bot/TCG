@@ -330,7 +330,8 @@ const Dashboard = ({ user, onLogout }) => {
     setIsLoadingMetaBrake(true);
     try {
       const response = await axios.get(
-        `${API}/meta-brake`
+        `${API}/meta-brake`,
+        { timeout: 45000 } // 45 seconds for Playwright scraping
       );
       setMetaBrakeData(response.data);
       toast.success('Meta Brake analysis complete!');
