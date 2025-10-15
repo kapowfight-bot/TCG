@@ -530,19 +530,17 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     if (hand.length > 0 && selectedBasics.size === 0) {
       const confirmed = window.confirm(
         '⚠️ Are you sure there are NO Basic Pokémon in this hand?\n\n' +
-        'Click "OK" to confirm (will count as a mulligan)\n' +
-        'Click "Cancel" to go back and select Basic Pokémon'
+        'YES (OK) = Add 1 mulligan and save\n' +
+        'NO (Cancel) = Don\'t save, let me select basics'
       );
       
       if (!confirmed) {
-        // User wants to go back and select basics
-        toast.info('Please select Basic Pokémon cards and save again');
+        // User clicked Cancel/NO - don't save, stay on current hand
         return;
       }
       
-      // User confirmed no basics - add 1 to mulligan count
+      // User clicked OK/YES - confirmed no basics, add 1 mulligan and continue saving
       additionalMulligan = 1;
-      toast.warning('Counted as mulligan (no basic Pokémon)');
     }
 
     setIsSaving(true);
