@@ -526,6 +526,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
     }
 
     // Check if current hand has no selected basics
+    let additionalMulligan = 0;
     if (hand.length > 0 && selectedBasics.size === 0) {
       const confirmed = window.confirm(
         '⚠️ Are you sure there are NO Basic Pokémon in this hand?\n\n' +
@@ -539,18 +540,15 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         return;
       }
       
-      // User confirmed no basics - count as mulligan
-      setMulliganCount(prev => prev + 1);
+      // User confirmed no basics - add 1 to mulligan count
+      additionalMulligan = 1;
       toast.warning('Counted as mulligan (no basic Pokémon)');
     }
 
     setIsSaving(true);
     try {
-      // Calculate test metrics
-      // Note: Use updated mulliganCount if we just incremented it
-      const finalMulliganCount = (hand.length > 0 && selectedBasics.size === 0) 
-        ? mulliganCount + 1 
-        : mulliganCount;
+      // Calculate test metrics with additional mulligan if confirmed
+      const finalMulliganCount = mulliganCount + additionalMulligan;
       
       const mulliganPercentage = testStats.totalHandsDrawn > 0 
         ? ((finalMulliganCount / testStats.totalHandsDrawn) * 100).toFixed(1)
