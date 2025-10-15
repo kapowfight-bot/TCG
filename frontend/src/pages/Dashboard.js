@@ -329,14 +329,14 @@ const Dashboard = ({ user, onLogout }) => {
     setIsLoadingMetaBrake(true);
     try {
       const response = await axios.get(
-        `${API}/meta-brake`,
-        { withCredentials: true }
+        `${API}/meta-brake`
       );
       setMetaBrakeData(response.data);
       toast.success('Meta Brake analysis complete!');
     } catch (error) {
       console.error('Error fetching meta brake data:', error);
-      toast.error('Failed to calculate meta breakers');
+      console.error('Full error details:', error.response?.data || error.message);
+      toast.error(`Failed to calculate meta breakers: ${error.response?.data?.detail || error.message}`);
       setMetaBrakeData(null);
     } finally {
       setIsLoadingMetaBrake(false);
