@@ -122,3 +122,6 @@ websockets==15.0.1
 yarl==1.22.0
 zipp==3.23.0
 beautifulsoup4==4.14.2
+playwright==1.55.0
+greenlet==3.2.4
+pyee==13.0.0
