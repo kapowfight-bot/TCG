@@ -686,6 +686,16 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
                   Mulligan (No Basic)
                 </Button>
                 
+                <label className="flex items-center gap-2 px-4 py-2 bg-red-900/30 border border-red-700/50 rounded-xl cursor-pointer hover:bg-red-900/50">
+                  <input
+                    type="checkbox"
+                    checked={isUnplayable}
+                    onChange={(e) => setIsUnplayable(e.target.checked)}
+                    className="w-4 h-4 rounded border-red-600 text-red-600 focus:ring-red-600"
+                  />
+                  <span className="text-red-400 font-semibold text-sm">Mark as Unplayable</span>
+                </label>
+                
                 <Button
                   data-testid="save-btn"
                   onClick={handleSave}
