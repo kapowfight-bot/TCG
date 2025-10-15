@@ -310,7 +310,8 @@ const Dashboard = ({ user, onLogout }) => {
     setIsLoadingMeta(true);
     try {
       const response = await axios.get(
-        `${API}/meta-wizard/${encodeURIComponent(deckName)}`
+        `${API}/meta-wizard/${encodeURIComponent(deckName)}`,
+        { timeout: 45000 } // 45 seconds for Playwright scraping
       );
       setMetaData(response.data);
       toast.success('Meta data loaded!');
