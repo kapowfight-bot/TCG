@@ -470,8 +470,12 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         totalTrainer: prev.totalTrainer + trainerCount,
         totalEnergy: prev.totalEnergy + energyCount,
         totalCards: prev.totalCards + 7,
-        totalBasicPokemon: prev.totalBasicPokemon + basicPokemonCount
+        totalBasicPokemon: prev.totalBasicPokemon + basicPokemonCount,
+        unplayableHands: prev.unplayableHands + (isUnplayable ? 1 : 0)
       }));
+      
+      // Reset unplayable flag for next hand
+      setIsUnplayable(false);
       
       console.log('Test stats updated:', {
         handsDrawn: testStats.totalHandsDrawn + 1,
