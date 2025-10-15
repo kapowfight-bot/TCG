@@ -748,19 +748,31 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
 
 @api_router.get("/meta-wizard/{deck_name}")
 async def get_meta_wizard(deck_name: str):
-    """Scrape TrainerHill meta data for deck matchups"""
+    """Scrape TrainerHill meta data for deck matchups using Playwright"""
     try:
-        # Scrape TrainerHill meta page
-        async with httpx.AsyncClient(timeout=15.0) as http_client:
-            response = await http_client.get("https://www.trainerhill.com/meta?game=PTCG")
-            response.raise_for_status()
-            
-            html = response.text
-            
-        # Parse HTML to find matchup data
+        from playwright.async_api import async_playwright
         import re
         from bs4 import BeautifulSoup
         
+        # Use Playwright to render JavaScript content
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            
+            try:
+                # Navigate to TrainerHill meta page
+                await page.goto("https://www.trainerhill.com/meta?game=PTCG", wait_until="networkidle", timeout=30000)
+                
+                # Wait for the table to load (adjust selector as needed)
+                await page.wait_for_selector("table", timeout=15000)
+                
+                # Get the rendered HTML
+                html = await page.content()
+                
+            finally:
+                await browser.close()
+        
+        # Parse HTML to find matchup data
         soup = BeautifulSoup(html, 'html.parser')
         
         # Normalize deck name for matching
@@ -770,6 +782,7 @@ async def get_meta_wizard(deck_name: str):
         
         # Find the matchup table
         tables = soup.find_all('table')
+        logger.info(f"Found {len(tables)} tables on the page")
         
         for table in tables:
             rows = table.find_all('tr')
@@ -788,6 +801,8 @@ async def get_meta_wizard(deck_name: str):
                 opponent_clean = re.sub(r'\s+', ' ', opponent_text).strip()
                 if opponent_clean and opponent_clean != '%=wins+ties3total':
                     opponent_names.append(opponent_clean)
+            
+            logger.info(f"Extracted {len(opponent_names)} opponent names from headers")
             
             # Find our deck's row
             for row in rows[1:]:
