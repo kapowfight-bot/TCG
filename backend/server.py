@@ -11,39 +11,9 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone, timedelta
 import httpx
-import subprocess
-import sys
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
-
-# Check and install Playwright browsers if needed (runs at startup)
-try:
-    # Check if chromium executable exists
-    chromium_paths = [
-        Path("/pw-browsers/chromium-1187/chrome-linux/chrome"),
-        Path("/pw-browsers/chromium-1187/chrome-linux/headless_shell"),
-        Path("/usr/local/share/playwright/chromium-1187/chrome-linux/headless_shell")
-    ]
-    
-    browser_found = any(path.exists() for path in chromium_paths)
-    
-    if not browser_found:
-        logging.warning("Playwright Chromium browser not found, attempting installation...")
-        result = subprocess.run(
-            [sys.executable, "-m", "playwright", "install", "chromium"],
-            capture_output=True,
-            text=True,
-            check=False
-        )
-        if result.returncode == 0:
-            logging.info("✅ Playwright Chromium browser installed successfully")
-        else:
-            logging.error(f"❌ Playwright installation failed: {result.stderr}")
-    else:
-        logging.info("✅ Playwright Chromium browser found and ready")
-except Exception as e:
-    logging.error(f"❌ Failed to check Playwright browsers: {e}")
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
