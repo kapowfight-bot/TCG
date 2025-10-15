@@ -218,11 +218,11 @@ frontend:
   
   - task: "Meta Wizard scraping endpoint"
     implemented: true
-    working: false
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -230,6 +230,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ISSUE: Meta Wizard endpoint is implemented and returns proper response structure, but TrainerHill scraping is not working. TrainerHill.com uses JavaScript/Dash framework to load content dynamically, so the HTML scraping approach only gets the page shell without actual meta data. All test deck names (Gardevoir, Charizard, etc.) return fallback 'Deck not found in meta' responses. The endpoint needs to be rewritten to use Limitless TCG API instead of scraping TrainerHill directly. Limitless TCG API is the proper data source that TrainerHill itself uses, but requires an access key approval process."
+      - working: "NA"
+        agent: "main"
+        comment: "Updated endpoint to use Playwright for JavaScript rendering. Installed playwright==1.55.0 and chromium browser. Modified endpoint to launch headless browser, navigate to TrainerHill, wait for content to load, then parse the rendered HTML. This should now capture the JavaScript-loaded matchup data. Ready for testing."
 
 frontend:
   - task: "Meta Wizard UI on Dashboard"
