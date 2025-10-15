@@ -746,6 +746,90 @@ async def save_test_results(deck_id: str, test_results: TestResults, request: Re
         logger.error(f"  test_results: {test_results}")
         raise HTTPException(status_code=500, detail=f"Error saving test results: {str(e)}")
 
+@api_router.get("/meta-wizard/{deck_name}")
+async def get_meta_wizard(deck_name: str):
+    """Scrape TrainerHill meta data for deck matchups"""
+    try:
+        # Scrape TrainerHill meta page
+        async with httpx.AsyncClient(timeout=15.0) as http_client:
+            response = await http_client.get("https://www.trainerhill.com/meta?game=PTCG")
+            response.raise_for_status()
+            
+            html = response.text
+            
+        # Parse HTML to find matchup data
+        # TrainerHill uses tables with deck matchups
+        import re
+        from bs4 import BeautifulSoup
+        
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # Normalize deck name for matching (remove "EX", spaces, etc.)
+        search_name = deck_name.lower().replace(' ex', '').replace('ex', '').strip()
+        
+        # Find the deck row in the meta table
+        matchups = []
+        
+        # Look for tables with matchup data
+        tables = soup.find_all('table')
+        
+        for table in tables:
+            rows = table.find_all('tr')
+            for row in rows:
+                cells = row.find_all(['td', 'th'])
+                if len(cells) > 0:
+                    # Check if this row contains our deck
+                    first_cell_text = cells[0].get_text().lower().strip()
+                    if search_name in first_cell_text or first_cell_text in search_name:
+                        # Found our deck, parse matchup data
+                        # Extract matchup percentages from remaining cells
+                        for i, cell in enumerate(cells[1:], 1):
+                            cell_text = cell.get_text().strip()
+                            # Look for percentage patterns (e.g., "65%", "45.5%")
+                            percentage_match = re.search(r'(\d+(?:\.\d+)?)\s*%', cell_text)
+                            if percentage_match:
+                                win_rate = float(percentage_match.group(1))
+                                # Get opponent name from header or context
+                                matchups.append({
+                                    'opponent': f'Matchup {i}',
+                                    'win_rate': win_rate
+                                })
+        
+        # If no structured data found, return mock data for now
+        if not matchups:
+            logger.warning(f"No matchup data found for {deck_name} on TrainerHill")
+            return {
+                'deck_name': deck_name,
+                'best_matchups': [
+                    {'opponent': 'Data not available', 'win_rate': 0}
+                ],
+                'worst_matchups': [
+                    {'opponent': 'Data not available', 'win_rate': 0}
+                ],
+                'source': 'TrainerHill',
+                'note': 'Unable to parse matchup data. Deck may not be in current meta.'
+            }
+        
+        # Sort matchups by win rate
+        sorted_matchups = sorted(matchups, key=lambda x: x['win_rate'], reverse=True)
+        
+        # Get best 3 and worst 3
+        best_3 = sorted_matchups[:3] if len(sorted_matchups) >= 3 else sorted_matchups
+        worst_3 = sorted_matchups[-3:] if len(sorted_matchups) >= 3 else sorted_matchups
+        worst_3.reverse()  # Show worst first
+        
+        return {
+            'deck_name': deck_name,
+            'best_matchups': best_3,
+            'worst_matchups': worst_3,
+            'source': 'TrainerHill',
+            'total_matchups': len(matchups)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching meta data from TrainerHill: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch meta data: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
