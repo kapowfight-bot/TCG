@@ -258,9 +258,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Meta Wizard scraping endpoint"
-  stuck_tasks: 
-    - "Meta Wizard scraping endpoint"
+    - "Meta Wizard UI on Dashboard"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
