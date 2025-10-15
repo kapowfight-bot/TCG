@@ -278,19 +278,42 @@ async def create_deck(deck_data: DeckCreate, request: Request):
 
 @api_router.get("/decks", response_model=List[Deck])
 async def get_decks(request: Request):
-    """Get all decks for current user"""
+    """Get all decks for current user with stats"""
     user = await get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     decks = await db.decks.find({"user_id": user.id}, {"_id": 0}).to_list(1000)
     
-    # Convert datetime strings back to datetime objects
+    # Convert datetime strings and add stats for each deck
     for deck in decks:
         if isinstance(deck.get('created_at'), str):
             deck['created_at'] = datetime.fromisoformat(deck['created_at'])
         if isinstance(deck.get('updated_at'), str):
             deck['updated_at'] = datetime.fromisoformat(deck['updated_at'])
+        
+        # Calculate basic stats for dashboard display
+        matches = await db.matches.find({"deck_id": deck["id"]}, {"_id": 0}).to_list(1000)
+        total_matches = len(matches)
+        
+        if total_matches > 0:
+            wins = sum(1 for m in matches if m["result"] == "win")
+            losses = total_matches - wins
+            win_rate = round((wins / total_matches) * 100, 1) if total_matches > 0 else 0
+            
+            deck['stats'] = {
+                'total_matches': total_matches,
+                'wins': wins,
+                'losses': losses,
+                'win_rate': win_rate
+            }
+        else:
+            deck['stats'] = {
+                'total_matches': 0,
+                'wins': 0,
+                'losses': 0,
+                'win_rate': 0
+            }
     
     return decks
 
