@@ -215,6 +215,31 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Added Refresh Card Data button in hand simulator warning message. Fetches card data for old decks without requiring deletion/re-import. Preserves match history and all stats."
+  
+  - task: "Meta Wizard scraping endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/meta-wizard/{deck_name} endpoint (lines 749-850) that scrapes TrainerHill.com matchup data. Uses httpx and BeautifulSoup4 to parse HTML table. Returns best 3 and worst 3 matchups with win rates. Needs testing to verify scraping logic works correctly."
+
+frontend:
+  - task: "Meta Wizard UI on Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Meta Wizard panel (lines 625-711) with deck selector and 'DO MAGIC' button. Displays best/worst matchups with win rates. Connected to backend endpoint. UI ready, waiting for backend testing."
 
 metadata:
   created_by: "main_agent"
