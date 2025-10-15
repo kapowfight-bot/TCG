@@ -563,6 +563,13 @@ class PokemonTCGTrackerTester:
         self.test_edit_deck_endpoint_structure()
         self.test_edit_deck_nonexistent_deck()
         
+        # Test Meta Wizard feature
+        self.test_meta_wizard_endpoint_exists()
+        self.test_meta_wizard_gardevoir()
+        self.test_meta_wizard_charizard()
+        self.test_meta_wizard_nonexistent_deck()
+        self.test_meta_wizard_scraping_functionality()
+        
         # Print summary
         print("\n" + "=" * 50)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
