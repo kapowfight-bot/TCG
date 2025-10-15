@@ -21,6 +21,8 @@ const Dashboard = ({ user, onLogout }) => {
   const [selectedDeckForMeta, setSelectedDeckForMeta] = useState(null);
   const [metaData, setMetaData] = useState(null);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
+  const [metaBrakeData, setMetaBrakeData] = useState(null);
+  const [isLoadingMetaBrake, setIsLoadingMetaBrake] = useState(false);
 
   useEffect(() => {
     fetchDecks();
