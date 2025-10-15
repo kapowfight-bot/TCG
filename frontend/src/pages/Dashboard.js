@@ -647,7 +647,16 @@ const Dashboard = ({ user, onLogout }) => {
             {/* Meta Wizard - 1 column */}
             <div className="lg:col-span-1">
               <div className="glass rounded-2xl p-6 sticky top-6">
-                <h3 className="text-2xl font-bold mb-4 text-white">🔮 Meta Wizard</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-2xl font-bold text-white">🔮 Meta Wizard</h3>
+                  <Button
+                    onClick={fetchMetaBrake}
+                    disabled={isLoadingMetaBrake}
+                    className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg"
+                  >
+                    {isLoadingMetaBrake ? '⚙️ Analyzing...' : '🔥 Meta Brake'}
+                  </Button>
+                </div>
                 
                 <div className="mb-4">
                   <label className="text-sm text-gray-400 mb-2 block">Select Deck</label>
