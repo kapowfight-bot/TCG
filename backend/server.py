@@ -51,6 +51,7 @@ class Deck(BaseModel):
     deck_list: str  # PTCGL format text
     card_data: Optional[dict] = None  # Cached card data from Pokemon TCG API
     test_results: Optional[dict] = None  # Hand simulator test results
+    stats: Optional[dict] = None  # Basic stats for dashboard (calculated on-demand)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
