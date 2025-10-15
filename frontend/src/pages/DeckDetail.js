@@ -964,9 +964,9 @@ const DeckDetail = ({ user, onLogout }) => {
                 ))}
               </div>
               
-              {/* Load More Button */}
-              {visibleMatchesCount < matches.length && (
-                <div className="mt-4 text-center">
+              {/* Load More / Show Less Buttons */}
+              <div className="mt-4 flex justify-center gap-3">
+                {visibleMatchesCount < matches.length && (
                   <Button
                     onClick={() => setVisibleMatchesCount(prev => prev + 5)}
                     variant="outline"
@@ -974,8 +974,18 @@ const DeckDetail = ({ user, onLogout }) => {
                   >
                     Load More ({matches.length - visibleMatchesCount} remaining)
                   </Button>
-                </div>
-              )}
+                )}
+                
+                {visibleMatchesCount > 5 && (
+                  <Button
+                    onClick={() => setVisibleMatchesCount(5)}
+                    variant="outline"
+                    className="border-gray-700 text-gray-300 hover:bg-gray-800 rounded-xl"
+                  >
+                    Show Less
+                  </Button>
+                )}
+              </div>
             </>
           )}
         </div>
