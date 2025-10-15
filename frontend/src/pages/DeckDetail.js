@@ -864,27 +864,43 @@ const DeckDetail = ({ user, onLogout }) => {
         {/* Matchup Stats */}
         {Object.keys(stats.opponent_stats).length > 0 && (
           <div className="glass rounded-2xl p-6 mb-8">
-            <h3 className="text-xl font-bold mb-4">Matchup Statistics</h3>
-            <div className="space-y-3">
-              {Object.entries(stats.opponent_stats).map(([opponent, opStats]) => (
-                <div key={opponent} className="bg-[#0f0f10] rounded-xl p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold">{opponent}</div>
-                      <div className="text-sm text-gray-400">
-                        {opStats.wins}W - {opStats.losses}L
+            <div 
+              className="flex items-center justify-between cursor-pointer mb-4"
+              onClick={() => setIsMatchupStatsExpanded(!isMatchupStatsExpanded)}
+            >
+              <h3 className="text-xl font-bold">Matchup Statistics</h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-6 w-6 transition-transform duration-200 ${isMatchupStatsExpanded ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            {isMatchupStatsExpanded && (
+              <div className="space-y-3">
+                {Object.entries(stats.opponent_stats).map(([opponent, opStats]) => (
+                  <div key={opponent} className="bg-[#0f0f10] rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold">{opponent}</div>
+                        <div className="text-sm text-gray-400">
+                          {opStats.wins}W - {opStats.losses}L
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-emerald-500">
-                        {Math.round((opStats.wins / opStats.total) * 100)}%
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-emerald-500">
+                          {Math.round((opStats.wins / opStats.total) * 100)}%
+                        </div>
+                        <div className="text-xs text-gray-500">{opStats.total} matches</div>
                       </div>
-                      <div className="text-xs text-gray-500">{opStats.total} matches</div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
