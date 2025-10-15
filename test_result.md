@@ -249,9 +249,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Display test results on Dashboard"
-    - "Display test results on DeckDetail page"
-    - "Display going second stats on DeckDetail page"
+    - "Meta Wizard scraping endpoint"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
