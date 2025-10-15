@@ -1,134 +1,118 @@
 <analysis>
-The AI engineer successfully built a Pokemon TCG deck tracker, progressing from initial requirements to a complex application. Key milestones include setting up a FastAPI backend with MongoDB and a React frontend, implementing Google OAuth, and fixing critical CORS issues. The development then focused on a robust hand simulator, involving multiple iterations to accurately detect card types, integrate with the Pokemon TCG API, and later establish a local card database for performance. Subsequent work addressed UI responsiveness, data caching, and detailed card visual representations. The latest phase involved implementing comprehensive test statistics for mulligans and card ratios, and integrating these into the dashboard and deck detail views. The trajectory demonstrates iterative development, frequent testing, and direct response to user feedback, overcoming technical challenges like API instability and data consistency issues.
+The AI engineer successfully built a Pokemon TCG deck tracker from initial requirements, progressively enhancing its functionality. Key features include full-stack implementation (FastAPI, React, MongoDB), Google OAuth, and a robust hand simulator. Significant development focused on improving card data reliability by transitioning from an external API to a local database, augmented by progressive population and scraping for images from LimitlessTCG when the primary API was unavailable. The UI was continuously refined to display detailed test statistics (mulligan, card ratios, basic Pokemon count), going second win/loss, collapsible sections, match history pagination, and a Meta Wizard feature for meta-game analysis. The work involved iterative problem-solving, including fixing CORS issues, data consistency (e.g., missing images in DB), deployment environment discrepancies, and refining user interaction with confirmation dialogs for test saves. The current focus is on debugging the Meta Wizard's web scraping.
 </analysis>
 
 <product_requirements>
-The user requested a Pokemon TCG deck tracker application. Initial requirements included:
-1.  **Deck Management:** Import decks from text (PTCGL format).
-2.  **Match Tracking:** Keep track of win/losses (overall and against specific opponent decks), date of match, identify bad games (unplayable opening hands), and record if the player went first or second, with additional notes.
+The user requested a Pokemon TCG deck tracker application with the following evolving requirements:
+1.  **Deck Management:** Import decks from text (PTCGL format), with an option to edit existing decks and reset hand test statistics upon card changes.
+2.  **Match Tracking:** Record win/losses (overall and against specific opponent decks), date, bad games (unplayable hands), player turn (first/second), and additional notes. Display going second win/loss statistics.
 3.  **Authentication:** Google Login.
-4.  **Styling:** Dark minimal design.
-5.  **Card Preview & Consistency (Later additions):**
+4.  **Styling:** Dark, minimal design.
+5.  **Card Preview & Simulation:**
     *   Preview cards visually.
-    *   Opening hand simulator with mulligan rules.
-    *   Track mulligan count per deck.
-    *   Correctly categorize Basic Pokemon (only those with Basic indicator), Evolved Pokemon, Trainers, and Energies.
-    *   Visual color-coded borders for card types (Green: Pokemon, Blue: Trainers, Yellow: Energies).
+    *   Opening hand simulator with mulligan rules, tracking mulligan count.
+    *   Correctly categorize (Basic, Evolved Pokemon, Trainers, Energies) and display with color-coded borders (Green: Pokemon, Blue: Trainers, Yellow: Energies).
     *   Smaller card display for small screens.
     *   Manual selection of basic Pokemon in hand simulator for mulligan decisions.
-    *   Save button for mulligan test results.
-    *   Mulligan button should always redraw hand.
-    *   Draw opening hand subsequent clicks: redraw if basic clicked, do nothing if not.
-6.  **Performance & Reliability (Later additions):**
-    *   Faster deck import.
-    *   Reliable card data fetching (initially from Pokemon TCG API, then transitioned to a local database).
-7.  **Test Metrics (Latest additions):**
-    *   Save mulligan percentage and card type ratios (Pokemon/Energy/Trainer) from test sessions.
-    *   Display these test metrics on the deck's main page and dashboard.
-    *   Display going second win/loss statistics on the deck's main page.
+    *   Draw opening hand subsequent clicks should redraw if basic is clicked, do nothing if not, and show error if no basics.
+    *   Save button for mulligan test results, with a prompt Are you sure there are no basic pokemon in the hand? if no basics are selected (YES: add 1 mulligan and save; NO: do nothing).
+    *   Hover over cards in hand simulator to show a larger image preview.
+    *   Add Basic Pokemon per hand statistic.
+6.  **Performance & Reliability:**
+    *   Faster, reliable card data fetching. Initially Pokemon TCG API, transitioned to a local database.
+    *   Implement Refresh Card Data button in hand simulator to re-fetch and update deck's card data.
+    *   Progressive local database population, creating basic card entries with images (from LimitlessTCG as fallback) if external APIs fail.
+7.  **Test Metrics:**
+    *   Save cumulative mulligan percentage and card type ratios (Pokemon/Energy/Trainer) from test sessions.
+    *   Display these test metrics on the dashboard and deck detail pages.
+8.  **UI Enhancements:**
+    *   **Dashboard:** Replace deck list text block with an image of the main Pokemon from the deck's name, overlaying the overall win rate. Add Meta Wizard section to the right of the deck list, searching TrainerHill for 3 best/worst matchups with win ratios and a DO MAGIC refresh button.
+    *   **Deck Detail:** Implement collapsible sections for Hand Simulator Test Results (start collapsed) and Match Statistics (start expanded). Implement pagination for Match History (show 5, Load More by 5, Show Less button).
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-stack Development:** React frontend, FastAPI backend, MongoDB database.
-- **Authentication:** Google OAuth2 integration with session management.
-- **API Integration:** Initially Pokemon TCG API for card data, later a custom local card database for performance and reliability.
-- **State Management:** React  and  for UI state and lifecycle.
-- **CORS Handling:** Correct configuration of  for authenticated requests.
-- **Environment Variables:** Extensive use of  files for configuration (, ).
-- **Pydantic Models:** Used in FastAPI for request/response validation and MongoDB document mapping.
+-   **Full-stack Development:** React (frontend), FastAPI (backend), MongoDB (database).
+-   **Authentication:** Google OAuth2, session management.
+-   **API Integration:** Pokemon TCG API, custom local card database, LimitlessTCG scraping (for images).
+-   **Web Scraping:**  and  for .
+-   **State Management:** React ,  for UI state and lifecycle.
+-   **CORS Handling:** Correct  configuration.
+-   **Environment Variables:**  files for , , .
+-   **Pydantic Models:** FastAPI data validation, MongoDB document mapping.
 </key_technical_concepts>
 
 <code_architecture>
 
 
 -   ****:
-    -   **Importance**: Main FastAPI application. Defines all backend API endpoints, handles database interactions (MongoDB), and serves the frontend.
+    -   **Importance**: Main FastAPI application handling API routes, database operations, and external API interactions.
     -   **Changes**:
-        -   Initial setup for Google login, deck creation, match logging, and basic stats.
-        -   Updated to use environment variables for  and .
-        -   Fixed CORS configuration to explicitly allow  instead of .
-        -   Added models/endpoints for , ,  including , .
-        -   Integrated Pokemon TCG API calls for card data fetching, later replaced with local database fetching.
-        -   Added endpoints for local card database (, ).
-        -   Corrected route registration order to place  endpoints before .
-        -   Added endpoint  to save mulligan test statistics.
-        -   Updated deck parsing logic to interpret card types from text sections (Pokemon:, Trainer:, Energy:).
-
+        -   Initial setup for Google login, deck/match management, and basic stats.
+        -   Updated  and  to use environment variables and allow production domains.
+        -   Added/updated models (, , ,  with ).
+        -   Integrated Pokemon TCG API, later shifted to local database fetching; added  and .
+        -   Added  for saving multiple cards.
+        -   Implemented  for scraping images from LimitlessTCG.
+        -   Modified  to re-fetch  and reset  if  changes.
+        -   Updated  to accumulate (instead of overwrite) test statistics and fixed  error for .
+        -   Enhanced  to include  and other stats for each deck.
+        -   Added  endpoint for TrainerHill scraping (currently being debugged).
+        -   Included  and  for web scraping.
 -   ****:
     -   **Importance**: Stores environment variables for backend configuration.
-    -   **Changes**: Added  and , with  dynamically set to .
-
+    -   **Changes**:  and  dynamically set to , updated to include production domain.
 -   ****:
-    -   **Importance**: Script to populate the local MongoDB with Pokemon TCG card data by fetching from the external API.
-    -   **Changes**: Created to address API fetching unreliability and performance issues, ensuring a local, faster data source.
-
+    -   **Importance**: A temporary script created to backfill  fields for existing cards in the MongoDB database by fetching from LimitlessTCG.
+    -   **Changes**: Created to resolve the issue where cards lacked image URLs after progressive population.
 -   ****:
-    -   **Importance**: A lightweight version of  for quick testing with a small subset of cards.
-    -   **Changes**: Created for debugging the local database integration without long seeding times.
-
--   ****:
-    -   **Importance**: Main React component, handles global state, routing, and authentication checks.
-    -   **Changes**:  callback integrated with  to manage authenticated state.
-
--   ****:
-    -   **Importance**: User authentication entry point.
+    -   **Importance**: Displays a summary of all user's decks and allows deck import.
     -   **Changes**:
-        -   Updated to use  for API calls.
-        -   Improved error handling for authentication, preventing UI freeze.
-        -   Added Cancel button to loading state.
-        -   Corrected redirect URL after Google OAuth.
-
+        -   Updated to fetch and cache card data (local DB, external API fallback, basic entry creation) for imported decks.
+        -   Displays new test statistics, including .
+        -   Replaced the deck list text block with a featured Pokemon image (extracted from ) and overlaid the overall .
+        -   Integrated the Meta Wizard section, with state for  and , and  function.
+        -   Updated  for progressive card population and LimitlessTCG image fallback.
+        -   Switched Pokemon TCG API calls to use .
 -   ****:
-    -   **Importance**: Displays a summary of all user's decks.
+    -   **Importance**: Displays detailed information for a specific deck, including match history and the hand simulator.
     -   **Changes**:
-        -   Updated to fetch and cache card data () when importing new decks.
-        -   Modified to use the local database endpoint for card data.
-        -   Updated to display new test statistics alongside other deck metrics.
-
+        -   Integrated  component and passed  callback.
+        -   Added UI for Edit Deck functionality (button and dialog).
+        -   Displays test results (including ) and going second win/loss statistics.
+        -   Implemented collapsible sections for Hand Simulator Test Results (starts collapsed) and Match Statistics (starts expanded), and Matchup Statistics (starts expanded).
+        -   Added pagination to the Match History section (show 5, Load More, Show Less buttons).
+        -   Updated  for progressive card population and LimitlessTCG image fallback.
+        -   Switched Pokemon TCG API calls to use .
 -   ****:
-    -   **Importance**: Displays detailed information for a specific deck, including match history and access to the hand simulator.
+    -   **Importance**: Core component for simulating opening hands, applying mulligan rules, and tracking statistics.
     -   **Changes**:
-        -   Integrated the  component.
-        -   Updated to handle deck updates with card data re-caching.
-        -   Added UI to display test results from the hand simulator.
-        -   Added UI to display going second win/loss statistics.
-        -   Updated grid layout to accommodate new stat cards.
-
+        -   Implemented loading indicators, error handling, and card display redesign.
+        -   Updated to use cached card data from the  object.
+        -   Added  function and a Refresh Card Data button.
+        -   Implemented hover functionality to show larger card previews using  state.
+        -   Refined  logic for basic Pokemon counting based on  (user clicks), not card flags, and added  to .
+        -   Implemented  for Are you sure there are no basic pokemon in the hand? confirmation when saving without selected basics, and correctly increments mulligan count.
+        -   Updated  for progressive card population and LimitlessTCG image fallback.
+        -   Switched Pokemon TCG API calls to use .
 -   ****:
-    -   **Importance**: Core component for simulating opening hands, applying mulligan rules, and tracking related statistics.
-    -   **Changes**:
-        -   Initial creation with basic hand drawing.
-        -   Updated to use cached card data from the  object instead of direct API calls.
-        -   Implemented loading indicators and error handling for API calls.
-        -   Fixed CSS for card display positioning.
-        -   Redesigned to show detailed card information with color coding.
-        -   Simplified card display to focus on categorization with color-coded borders and smaller sizes.
-        -   Implemented manual basic Pokemon selection, mulligan logic, and save functionality for test sessions.
-        -   Added state for ,  to track simulation stats.
-        -   Integrated  for saving test results and  for user feedback.
-        -   Updated  logic and  to ensure correct hand refreshing and mulligan counting.
-        -   Enhanced debugging and prominent messages for missing card data.
-        -   Adjusted card rendering to display detailed info (Name, HP, Attacks, etc.) with correct color coding based on parsed types.
-
--   ****:
-    -   **Importance**: Stores environment variables for frontend configuration.
-    -   **Changes**: Updated  and  to ensure correct backend communication.
+    -   **Importance**: Stores frontend environment variables.
+    -   **Changes**: Updated  (including production URL) and , added .
 </code_architecture>
 
 <pending_tasks>
-- There are no explicit pending tasks mentioned by the user that have not been acted upon or are not currently in progress.
+-   Fix the scraping logic for the Meta Wizard feature in  to correctly parse matchup data from .
+-   Verify the Meta Wizard functionality in the preview environment after the scraping logic is fixed.
+-   Redeploy the application to production to apply all the latest fixes and features, including the basic Pokemon count, win rate overlay, and Meta Wizard.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was working on integrating and displaying the newly implemented test statistics and going second win/loss statistics into the main application UI. This involves:
+Immediately before this summary request, the AI engineer was working on integrating the Meta Wizard feature into the Dashboard. This feature is intended to display the best and worst matchups for a user's selected deck by scraping data from .
 
-1.  **Displaying Test Statistics on Dashboard Deck Cards**: Modifying  to show the aggregated test results (e.g., mulligan percentage, card type ratios from simulations) for each deck listed.
-2.  **Displaying Going Second W/L Statistics on Deck Detail Page**: Updating  to show the win/loss record specifically for games where the user went second.
-3.  **Adjusting UI Grid Layout**: Modifying the grid structure in  to accommodate the additional stat cards or sections without disrupting the existing layout.
+The backend has a new endpoint  in , utilizing  and  for web scraping. The frontend, specifically , has been updated to include a dedicated Meta Wizard panel positioned to the right of the deck list, along with a DO MAGIC button to initiate the data fetching process.
 
-The last action performed was to modify the grid layout in  to accommodate the new stat card, and the next immediate step is to test these updated displays.
+The user reported that the feature is not correctly fetching and displaying matchup data. The AI engineer is currently in the process of debugging and refining the web scraping logic within the backend endpoint, having already analyzed the HTML structure of  to identify the correct parsing strategy for the matchup table.
 </current_work>
 
 <optional_next_step>
-Test the updated displays for test statistics on the dashboard and going second stats on the deck detail page.
+Refine the backend scraping logic in  for the Meta Wizard feature.
 </optional_next_step>

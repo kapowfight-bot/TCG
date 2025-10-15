@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 class EditDeckFunctionalityTester:
-    def __init__(self, base_url="https://deck-test-stats.preview.emergentagent.com"):
+    def __init__(self, base_url="https://handtester.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.deck_id = "79572d04-3a16-4c1a-b967-016d1d62b798"
