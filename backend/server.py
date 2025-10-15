@@ -672,6 +672,7 @@ class TestResults(BaseModel):
     avg_trainer: float
     avg_energy: float
     avg_basic_pokemon: float = 0.0  # Optional for backward compatibility
+    unplayable_hands: int = 0  # Optional for backward compatibility
 
 @api_router.post("/decks/{deck_id}/test-results")
 async def save_test_results(deck_id: str, test_results: TestResults, request: Request):
