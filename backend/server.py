@@ -910,7 +910,22 @@ async def get_meta_brake():
         
         # Use Playwright to render JavaScript content
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            try:
+                browser = await p.chromium.launch(headless=True)
+            except Exception as browser_error:
+                # Fallback: Return sample data when Playwright browsers not installed
+                logger.warning(f"Playwright browser launch failed: {browser_error}")
+                logger.warning("Returning sample meta brake data. Install Playwright browsers for real data.")
+                return {
+                    'top_decks': [
+                        {'deck_name': 'Sample Meta Breaker 1', 'overall_wr': 54.5, 'weighted_score': 54.2},
+                        {'deck_name': 'Sample Meta Breaker 2', 'overall_wr': 52.8, 'weighted_score': 52.5}
+                    ],
+                    'source': 'Sample Data (Playwright not available)',
+                    'total_analyzed': 14,
+                    'note': 'Sample data shown. Install Playwright browsers in production for real TrainerHill analysis.'
+                }
+            
             page = await browser.new_page()
             
             try:
