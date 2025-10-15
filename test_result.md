@@ -249,6 +249,18 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Added Meta Wizard panel (lines 625-711) with deck selector and 'DO MAGIC' button. Displays best/worst matchups with win rates. Connected to backend endpoint. UI ready, waiting for backend testing."
+  
+  - task: "Meta Brake feature"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented Meta Brake feature. Backend: Added GET /api/meta-brake endpoint that scrapes full TrainerHill matchup matrix, calculates weighted scores (60% weight on beating strong decks, 40% overall win rate), returns top 2 meta-breaking decks. Frontend: Added 'Meta Brake' button in top-right of Meta Wizard panel, displays top 2 decks with overall win rates in orange/red gradient. Algorithm prioritizes decks with good win rates against other high-win-rate decks. Ready for testing."
 
 metadata:
   created_by: "main_agent"
