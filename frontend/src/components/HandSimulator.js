@@ -562,7 +562,8 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
       console.log('Saving test results:', {
         deckId,
         totalHandsDrawn: testStats.totalHandsDrawn,
-        mulliganCount,
+        mulliganCount: finalMulliganCount,
+        additionalMulligan,
         mulliganPercentage,
         avgPokemon,
         avgTrainer,
@@ -575,7 +576,7 @@ const HandSimulator = ({ deckList, cardData, deckId, isOpen, onClose, onDeckUpda
         `${API}/decks/${deckId}/test-results`,
         {
           total_hands: testStats.totalHandsDrawn,
-          mulligan_count: mulliganCount,
+          mulligan_count: finalMulliganCount,
           mulligan_percentage: parseFloat(mulliganPercentage),
           avg_pokemon: parseFloat(avgPokemon),
           avg_trainer: parseFloat(avgTrainer),
