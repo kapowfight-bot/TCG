@@ -1,8 +1,8 @@
 {
-  "total_tests": 26,
-  "passed_tests": 26,
-  "failed_tests": 0,
-  "success_rate": 100.0,
+  "total_tests": 31,
+  "passed_tests": 28,
+  "failed_tests": 3,
+  "success_rate": 90.32258064516128,
   "test_results": [
     {
       "test": "Backend Health Check",
@@ -133,6 +133,31 @@
       "test": "Edit Deck (Non-existent)",
       "success": true,
       "details": "Status: 401"
+    },
+    {
+      "test": "Meta Wizard Endpoint Exists",
+      "success": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Meta Wizard Gardevoir",
+      "success": false,
+      "details": "Status: 200, Fields: False, Structure: False, Matchups: True"
+    },
+    {
+      "test": "Meta Wizard Charizard",
+      "success": false,
+      "details": "Status: 200, Fields: False, Structure: True"
+    },
+    {
+      "test": "Meta Wizard Non-existent Deck",
+      "success": true,
+      "details": "Status: 200, Fields: True, Fallback: True"
+    },
+    {
+      "test": "Meta Wizard Scraping Functionality",
+      "success": false,
+      "details": "Successful scrapes: 0/3"
     }
   ]
 }
