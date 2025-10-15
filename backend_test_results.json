@@ -1,8 +1,8 @@
 {
   "total_tests": 31,
-  "passed_tests": 31,
-  "failed_tests": 0,
-  "success_rate": 100.0,
+  "passed_tests": 29,
+  "failed_tests": 2,
+  "success_rate": 93.54838709677419,
   "test_results": [
     {
       "test": "Backend Health Check",
@@ -141,13 +141,13 @@
     },
     {
       "test": "Meta Wizard Gardevoir",
-      "success": true,
-      "details": "Status: 200, Fields: True, Structure: True, Fallback: True"
+      "success": false,
+      "details": "HTTPSConnectionPool(host='handtester.preview.emergentagent.com', port=443): Read timed out. (read timeout=15)"
     },
     {
       "test": "Meta Wizard Charizard",
-      "success": true,
-      "details": "Status: 200, Fields: True, Structure: True"
+      "success": false,
+      "details": "HTTPSConnectionPool(host='handtester.preview.emergentagent.com', port=443): Read timed out. (read timeout=15)"
     },
     {
       "test": "Meta Wizard Non-existent Deck",
