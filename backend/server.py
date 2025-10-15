@@ -762,7 +762,29 @@ async def get_meta_wizard(deck_name: str):
         
         # Use Playwright to render JavaScript content
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            try:
+                browser = await p.chromium.launch(headless=True)
+            except Exception as browser_error:
+                # Fallback: Return sample data when Playwright browsers not installed
+                logger.warning(f"Playwright browser launch failed: {browser_error}")
+                logger.warning("Returning sample meta data. Install Playwright browsers for real data.")
+                return {
+                    'deck_name': deck_name,
+                    'best_matchups': [
+                        {'opponent': 'Sample Deck A', 'win_rate': 58.5},
+                        {'opponent': 'Sample Deck B', 'win_rate': 55.2},
+                        {'opponent': 'Sample Deck C', 'win_rate': 52.8}
+                    ],
+                    'worst_matchups': [
+                        {'opponent': 'Sample Deck X', 'win_rate': 35.4},
+                        {'opponent': 'Sample Deck Y', 'win_rate': 38.9},
+                        {'opponent': 'Sample Deck Z', 'win_rate': 42.1}
+                    ],
+                    'source': 'Sample Data (Playwright not available)',
+                    'total_matchups': 14,
+                    'note': 'Sample data shown. Install Playwright browsers in production for real TrainerHill data.'
+                }
+            
             page = await browser.new_page()
             
             try:
